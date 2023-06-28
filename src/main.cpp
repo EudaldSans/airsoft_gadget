@@ -20,31 +20,34 @@
 #define LOOP_DELAY 0 // This controls how frequently the meter is updated
                      // for test purposes this is set to 0
 
-#include "ammo_screen.h"
+// #include "ammo_screen.h"
 
 #include "Wire.h"
 #include "I2Cdev.h"
 #include <HMC5883L.h>
 
+#include "menu.h"
+
+uint16_t total_ammo = 30, current_ammo = 30;
 
 HMC5883L mag;
 int16_t mx, my, mz;
 
+DecreasingAmmoMenu* dec_ammo_menu;
+IncreasingAmmoMenu* inc_ammo_menu;
 
-void ammoMeterUpdateValue(uint16_t ammo);
-void ammoMeterInit();
-void ammoMeterUpdateColor(uint32_t color);
-
-void ammoCounterUpdate(uint16_t ammo);
-
-void updateHeading(float heading);
-
-void IRAM_ATTR shot_detected_ISR(void);
+void shot_detected_ISR(void);
 
 void setup(void) {
-    Serial.begin(115200);
+    screen_data_t data = {0};
+    data.current_ammo = current_ammo;
+    data.total_ammo = total_ammo;
+    data.heading = 0;
 
-    ammoScreenInit(30);
+    Serial.begin(115200);
+    Serial.println("Start");
+
+    // ammoScreenInit(30);
 
     Wire.setPins(22, 21);
     // join I2C bus (I2Cdev library doesn't do this automatically)
@@ -58,12 +61,23 @@ void setup(void) {
     Serial.println("Testing device connections...");
     Serial.println(mag.testConnection() ? "HMC5883L connection successful" : "HMC5883L connection failed");
 
-    attachInterrupt(15, ammoScreenDecreaseAmmo, FALLING);
-    attachInterrupt(0, ammoScreenReload, FALLING);
+    Serial.println("Starting DecreasingAmmoMenu");
+    
+    // dec_ammo_menu = new DecreasingAmmoMenu;
+    // dec_ammo_menu->update(data, true);
+
+    inc_ammo_menu = new IncreasingAmmoMenu;
+    inc_ammo_menu->update(data, true);
+
+    attachInterrupt(15, shot_detected_ISR, FALLING);
+    // attachInterrupt(0, ammoScreenReload, FALLING);
 }
 
 
 void loop() {
+    screen_data_t data = {0};
+    data.current_ammo = current_ammo;
+    data.total_ammo = total_ammo;
     // read raw heading measurements from device
     mag.getHeading(&mx, &my, &mz);
     
@@ -72,9 +86,17 @@ void loop() {
     if(heading < 0) heading += 2 * M_PI;
     heading = heading * 180/M_PI;
 
-    ammoScreenUpdate(heading);
+    data.heading = heading;
+
+    // dec_ammo_menu->update(data, false);
+    inc_ammo_menu->update(data, false);
 
     delay(200);
+}
+
+
+void IRAM_ATTR shot_detected_ISR(void) {
+    if (current_ammo > 0) {current_ammo--;}
 }
 
 
