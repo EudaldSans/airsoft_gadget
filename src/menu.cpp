@@ -37,7 +37,7 @@ void Menu::updateAmoCounter(uint16_t ammo, uint16_t color, bool init) {
     uint16_t width, height;
     String text;
 
-    if (color != last_color || init) {large_font_spr.setTextColor(color);}
+    if (color != last_color || init) {large_font_spr.setTextColor(color, DARKER_GREY);}
     
     if (ammo >= 100) {text = " " + (String) ammo + " ";}
     else {text = "  " + (String) ammo + "  ";}
@@ -84,7 +84,7 @@ void Menu::updateHeading(float heading, uint16_t color, bool init) {
     Serial.print(heading);
     Serial.print("\n");
 
-    if (color != last_color || init) {small_font_spr.setTextColor(color);}
+    if (color != last_color || init) {small_font_spr.setTextColor(color, DARKER_GREY);}
 
     if (heading <= 22.5 || heading > 337.5)         {text = "  N  ";}
     else if (heading > 22.5 && heading <= 67.5)     {text = "NE";}
@@ -103,11 +103,11 @@ void Menu::updateHeading(float heading, uint16_t color, bool init) {
     small_font_spr.printToSprite(text);
 }
 
-void update(screen_data_t data) {Serial.println("Called menu Update!");}
+void Menu::update(screen_data_t data, bool init) {Serial.println("Called menu Update!");}
 
-void btn0()         {Serial.println("Called menu btn0!");}
-void btn1()         {Serial.println("Called menu btn1!");}
-void btn2()         {Serial.println("Called menu btn2!");}
+void Menu::btn0()         {Serial.println("Called menu btn0!");}
+void Menu::btn1()         {Serial.println("Called menu btn1!");}
+void Menu::btn2()         {Serial.println("Called menu btn2!");}
 
-void scrollUp()     {Serial.println("Called menu ScrollUp!");}
-void scrollDown()   {Serial.println("Called menu scrollDown!");}
+void Menu::scrollUp()     {Serial.println("Called menu ScrollUp!");}
+void Menu::scrollDown()   {Serial.println("Called menu scrollDown!");}

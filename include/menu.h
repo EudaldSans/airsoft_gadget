@@ -18,18 +18,26 @@ typedef struct {
     float heading;
 } screen_data_t;
 
+
+typedef enum {
+    DEC_AMMO_MENU = 0,
+    INC_AMMO_MENU,
+    NUMBER_OF_MENUS
+} menu_t;
+
 class Menu {
     public:
         Menu();
+        virtual ~Menu(){};
 
-        void update(screen_data_t data, bool init);
+        virtual void update(screen_data_t data, bool init);
 
-        void btn0();
-        void btn1();
-        void btn2();
+        virtual void btn0();
+        virtual void btn1();
+        virtual void btn2();
 
-        void scrollUp();
-        void scrollDown();
+        virtual void scrollUp();
+        virtual void scrollDown();
 
         bool reload = false;
     
@@ -43,14 +51,18 @@ class Menu {
 class DecreasingAmmoMenu : public Menu {
     public:
         DecreasingAmmoMenu();
-        bool reload = true;
+
         void update(screen_data_t data, bool init);
+
+        bool reload = true;
 };
 
 
 class IncreasingAmmoMenu : public Menu {
     public:
         IncreasingAmmoMenu();
-        bool reload = true;
+
         void update(screen_data_t data, bool init);
+
+        bool reload = true;
 };

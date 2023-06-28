@@ -33,10 +33,11 @@ uint16_t total_ammo = 30, current_ammo = 30;
 HMC5883L mag;
 int16_t mx, my, mz;
 
-DecreasingAmmoMenu* dec_ammo_menu;
-IncreasingAmmoMenu* inc_ammo_menu;
+Menu* menus[NUMBER_OF_MENUS];
+uint8_t current_menu = DEC_AMMO_MENU;
 
 void shot_detected_ISR(void);
+void btn0_ISR(void); 
 
 void setup(void) {
     screen_data_t data = {0};
@@ -66,11 +67,13 @@ void setup(void) {
     // dec_ammo_menu = new DecreasingAmmoMenu;
     // dec_ammo_menu->update(data, true);
 
-    inc_ammo_menu = new IncreasingAmmoMenu;
-    inc_ammo_menu->update(data, true);
+    menus[DEC_AMMO_MENU] = new DecreasingAmmoMenu();
+    menus[INC_AMMO_MENU] = new IncreasingAmmoMenu();
+
+    menus[0]->update(data, true);
 
     attachInterrupt(15, shot_detected_ISR, FALLING);
-    // attachInterrupt(0, ammoScreenReload, FALLING);
+    attachInterrupt(0, btn0_ISR, FALLING);
 }
 
 
@@ -89,7 +92,7 @@ void loop() {
     data.heading = heading;
 
     // dec_ammo_menu->update(data, false);
-    inc_ammo_menu->update(data, false);
+    menus[current_menu]->update(data, false);
 
     delay(200);
 }
@@ -97,6 +100,11 @@ void loop() {
 
 void IRAM_ATTR shot_detected_ISR(void) {
     if (current_ammo > 0) {current_ammo--;}
+}
+
+void IRAM_ATTR btn0_ISR(void) {
+    current_menu++;
+    if (current_menu >= NUMBER_OF_MENUS) {current_menu = 0;}
 }
 
 
