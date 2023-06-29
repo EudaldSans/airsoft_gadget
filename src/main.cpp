@@ -26,7 +26,7 @@
 #include "I2Cdev.h"
 #include <HMC5883L.h>
 
-#include "menu.h"
+#include "menus.h"
 
 uint16_t total_ammo = 30, current_ammo = 30;
 
@@ -34,7 +34,7 @@ HMC5883L mag;
 int16_t mx, my, mz;
 
 Menu* menus[NUMBER_OF_MENUS];
-uint8_t current_menu = DEC_AMMO_MENU;
+uint8_t current_menu = KDR_MENU;
 
 void shot_detected_ISR(void);
 void btn0_ISR(void); 
@@ -67,10 +67,11 @@ void setup(void) {
     // dec_ammo_menu = new DecreasingAmmoMenu;
     // dec_ammo_menu->update(data, true);
 
-    menus[DEC_AMMO_MENU] = new DecreasingAmmoMenu();
-    menus[INC_AMMO_MENU] = new IncreasingAmmoMenu();
+    menus[DEC_AMMO_MENU]    = new DecreasingAmmoMenu();
+    menus[INC_AMMO_MENU]    = new IncreasingAmmoMenu();
+    menus[KDR_MENU]         = new KDRMenu();
 
-    menus[0]->update(data, true);
+    menus[current_menu]->update(data, true);
 
     attachInterrupt(15, shot_detected_ISR, FALLING);
     attachInterrupt(0, btn0_ISR, FALLING);

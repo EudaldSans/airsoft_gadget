@@ -22,6 +22,7 @@ typedef struct {
 typedef enum {
     DEC_AMMO_MENU = 0,
     INC_AMMO_MENU,
+    KDR_MENU,
     NUMBER_OF_MENUS
 } menu_t;
 
@@ -45,6 +46,8 @@ class Menu {
         void updateHeading(float, uint16_t color, bool init);
         void updateArcMeter(uint16_t new_start_angle, uint16_t new_end_angle, uint16_t color, bool init);
         void updateAmoCounter(uint16_t ammo, uint16_t color, bool init);
+        void updateKDR(float kdr, uint16_t color, bool init);
+        void updateCentralText(String str, uint16_t color, bool init);
 
 };
 
@@ -65,4 +68,22 @@ class IncreasingAmmoMenu : public Menu {
         void update(screen_data_t data, bool init);
 
         bool reload = true;
+};
+
+
+class KDRMenu : public Menu {
+    public:
+        KDRMenu();
+
+        void update(screen_data_t data, bool init);
+
+        void btn0();
+        void btn1();
+        void btn2();
+
+        bool reload = false;
+
+    private:
+        uint16_t kills;
+        uint16_t deaths;
 };

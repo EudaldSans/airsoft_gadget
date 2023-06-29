@@ -1,9 +1,12 @@
-#include "menu.h"
+#include "menus.h"
 
 #include "BlackOpsOne75.h"
 #include "BlackOpsOne28.h"
 
 #include "logo.h"
+
+#include <iomanip>
+#include <sstream>
 
 // The font names are arrays references, thus must NOT be in quotes ""
 #define FONT_75p BlackOpsOne75
@@ -53,9 +56,20 @@ void Menu::updateArcMeter(uint16_t new_start_angle, uint16_t new_end_angle, uint
     static uint16_t last_end_angle = 30, last_start_angle = 330;
     static uint16_t meter_last_color = TFT_GREEN;
 
-    if (meter_last_color != color || init) {
+    if (init) {
         tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
+        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, ARC_START, new_start_angle, TFT_BLACK, DARKER_GREY); 
+        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_end_angle, ARC_END, TFT_BLACK, DARKER_GREY);
 
+        last_end_angle = new_end_angle;
+        last_start_angle = new_start_angle;
+        meter_last_color = color;
+
+        return;
+    }
+
+    if (meter_last_color != color) {
+        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
     } 
     
     if (new_end_angle > last_end_angle) {
@@ -101,6 +115,44 @@ void Menu::updateHeading(float heading, uint16_t color, bool init) {
 
     tft.setCursor(SCREEN_CENTER - width/2, tft.height() - height);
     small_font_spr.printToSprite(text);
+}
+
+void Menu::updateKDR(float kdr, uint16_t color, bool init) {
+    static uint16_t last_color = TFT_GREEN;
+    uint16_t width, height;
+    String text;
+
+    if (color != last_color || init) {large_font_spr.setTextColor(color, DARKER_GREY);}
+    last_color = color;
+
+    if (kdr > 100) {text = String(kdr, 0);}
+    else if (kdr > 10) {text = String(kdr, 1);}
+    else {text = String(kdr, 2);}
+
+    width = large_font_spr.textWidth(text);
+    height = large_font_spr.fontHeight();
+    
+    tft.setCursor(SCREEN_CENTER - width/2, SCREEN_CENTER - height/2);
+    large_font_spr.printToSprite(text);
+}
+
+void Menu::updateCentralText(String str, uint16_t color, bool init) {
+    static uint16_t last_width = 0, last_color = TFT_GREEN;
+    uint16_t width, height;
+    
+    Serial.print("Updating central text to: ");
+    Serial.println(str);
+
+    if (color != last_color || init) {large_font_spr.setTextColor(color, DARKER_GREY);}
+
+    width = large_font_spr.textWidth(str);
+    height = large_font_spr.fontHeight();
+
+    if (last_width > width) {tft.fillRect(SCREEN_CENTER - last_width/2, SCREEN_CENTER - height/2, last_width, height, DARKER_GREY);}
+    last_width = width;
+
+    tft.setCursor(SCREEN_CENTER - width/2, SCREEN_CENTER - height/2);
+    large_font_spr.printToSprite(str);
 }
 
 void Menu::update(screen_data_t data, bool init) {Serial.println("Called menu Update!");}
