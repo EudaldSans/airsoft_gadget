@@ -13,13 +13,14 @@ void DecreasingAmmoMenu::update(screen_data_t data, bool init) {
     static uint32_t color = TFT_GREEN;
     float current_ratio = (float)data.current_ammo / data.total_ammo;
     uint16_t meter_angle =  300 * current_ratio + 30;
+    String ammo_text = String(data.current_ammo, 10);
     
     if (current_ratio > 0.5 && previous_ratio <= 0.5) { color = TFT_GREEN;} 
     else if (current_ratio > 0.25 && previous_ratio <= 0.5) {color = TFT_YELLOW;} 
     else if (current_ratio < 0.25 && previous_ratio <= 0.25) {color = TFT_RED;} 
     
     Menu::updateArcMeter(ARC_START, meter_angle, color, init);
-    Menu::updateAmoCounter(data.current_ammo, color, init);
+    Menu::updateCentralText(ammo_text, color, init);
     Menu::updateHeading(data.heading, color, init);  
 
     previous_ratio = current_ratio;
@@ -33,13 +34,14 @@ void IncreasingAmmoMenu::update(screen_data_t data, bool init) {
     static uint32_t color = TFT_GREEN;
     float current_ratio = (float)data.current_ammo / data.total_ammo;
     uint16_t meter_angle =  360 - (300 * current_ratio + 30);
+    String ammo_text = String(data.current_ammo, 10);
     
     if (current_ratio > 0.5 && previous_ratio <= 0.5) { color = TFT_GREEN;} 
     else if (current_ratio > 0.25 && previous_ratio <= 0.5) {color = TFT_YELLOW;} 
     else if (current_ratio < 0.25 && previous_ratio <= 0.25) {color = TFT_RED;} 
     
     Menu::updateArcMeter(meter_angle, ARC_END, color, init);
-    Menu::updateAmoCounter(data.total_ammo - data.current_ammo, color, init);
+    Menu::updateCentralText(ammo_text, color, init);
     Menu::updateHeading(data.heading, color, init);  
 
     previous_ratio = current_ratio;
