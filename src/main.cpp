@@ -26,7 +26,11 @@
 #include "I2Cdev.h"
 #include <HMC5883L.h>
 
+#include "TFT_eSPI.h"
+
 #include "menus.h"
+
+TFT_eSPI tft = TFT_eSPI();
 
 uint16_t total_ammo = 30, current_ammo = 30;
 bool init_menu = true;
@@ -68,9 +72,9 @@ void setup(void) {
     // dec_ammo_menu = new DecreasingAmmoMenu;
     // dec_ammo_menu->update(data, true);
 
-    menus[DEC_AMMO_MENU]    = new DecreasingAmmoMenu();
-    menus[INC_AMMO_MENU]    = new IncreasingAmmoMenu();
-    menus[KDR_MENU]         = new KDRMenu();
+    menus[DEC_AMMO_MENU]    = new DecreasingAmmoMenu(&tft);
+    menus[INC_AMMO_MENU]    = new IncreasingAmmoMenu(&tft);
+    menus[KDR_MENU]         = new KDRMenu(&tft);
 
     attachInterrupt(15, shot_detected_ISR, FALLING);
     attachInterrupt(0, btn0_ISR, FALLING);

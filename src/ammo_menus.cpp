@@ -6,7 +6,7 @@
 #include "logo.h"
 
 
-DecreasingAmmoMenu::DecreasingAmmoMenu():Menu() {}
+DecreasingAmmoMenu::DecreasingAmmoMenu(TFT_eSPI* p_tft):Menu(p_tft) {}
 
 void DecreasingAmmoMenu::update(screen_data_t data, bool init) {
     static float previous_ratio = 1;
@@ -27,7 +27,7 @@ void DecreasingAmmoMenu::update(screen_data_t data, bool init) {
 }
 
 
-IncreasingAmmoMenu::IncreasingAmmoMenu():Menu() {}
+IncreasingAmmoMenu::IncreasingAmmoMenu(TFT_eSPI* p_tft):Menu(p_tft) {}
 
 void IncreasingAmmoMenu::update(screen_data_t data, bool init) {
     static float previous_ratio = 1;

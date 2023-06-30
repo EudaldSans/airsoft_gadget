@@ -28,7 +28,7 @@ typedef enum {
 
 class Menu {
     public:
-        Menu();
+        Menu(TFT_eSPI* p_tft);
         virtual ~Menu(){};
 
         virtual void update(screen_data_t data, bool init);
@@ -49,11 +49,15 @@ class Menu {
         void updateKDR(float kdr, uint16_t color, bool init);
         void updateCentralText(String str, uint16_t color, bool init);
 
+    private:
+        TFT_eSPI* _tft;
+        TFT_eSprite* _large_font_spr;
+        TFT_eSprite* _small_font_spr;
 };
 
 class DecreasingAmmoMenu : public Menu {
     public:
-        DecreasingAmmoMenu();
+        DecreasingAmmoMenu(TFT_eSPI* p_tft);
 
         void update(screen_data_t data, bool init);
 
@@ -63,7 +67,7 @@ class DecreasingAmmoMenu : public Menu {
 
 class IncreasingAmmoMenu : public Menu {
     public:
-        IncreasingAmmoMenu();
+        IncreasingAmmoMenu(TFT_eSPI* p_tft);
 
         void update(screen_data_t data, bool init);
 
@@ -73,7 +77,7 @@ class IncreasingAmmoMenu : public Menu {
 
 class KDRMenu : public Menu {
     public:
-        KDRMenu();
+        KDRMenu(TFT_eSPI* p_tft);
 
         void update(screen_data_t data, bool init);
 

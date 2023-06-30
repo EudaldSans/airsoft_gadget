@@ -5,7 +5,7 @@
 
 #include "logo.h"
 
-KDRMenu::KDRMenu(): Menu() {
+KDRMenu::KDRMenu(TFT_eSPI* p_tft): Menu(p_tft) {
     this->kills = 0;
     this->deaths = 0;
 }

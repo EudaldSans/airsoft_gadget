@@ -20,19 +20,19 @@
 
 #define DARKER_GREY 0x18E3
 
-TFT_eSPI tft = TFT_eSPI();
-TFT_eSprite large_font_spr = TFT_eSprite(&tft);
-TFT_eSprite small_font_spr = TFT_eSprite(&tft);
+Menu::Menu(TFT_eSPI* p_tft) {
+    this->_tft = p_tft;
+    this->_large_font_spr = new TFT_eSprite(p_tft);
+    this->_small_font_spr = new TFT_eSprite(p_tft);
 
-Menu::Menu() {
-    tft.begin();
-    tft.setRotation(1);
-    tft.fillScreen(DARKER_GREY);
+    this->_tft->begin();
+    this->_tft->setRotation(1);
+    this->_tft->fillScreen(DARKER_GREY);
 
-    large_font_spr.loadFont(FONT_75p);
-    large_font_spr.setColorDepth(16);
-    small_font_spr.loadFont(FONT_28p);   
-    small_font_spr.setColorDepth(16); 
+    this->_large_font_spr->loadFont(FONT_75p);
+    this->_large_font_spr->setColorDepth(16);
+    this->_small_font_spr->loadFont(FONT_28p);   
+    this->_small_font_spr->setColorDepth(16); 
 }
 
 void Menu::updateArcMeter(uint16_t new_start_angle, uint16_t new_end_angle, uint16_t color, bool init) {
@@ -40,43 +40,43 @@ void Menu::updateArcMeter(uint16_t new_start_angle, uint16_t new_end_angle, uint
     static uint16_t meter_last_color = TFT_GREEN;
 
     if (init) {
-        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
-        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, ARC_START, new_start_angle, TFT_BLACK, DARKER_GREY); 
-        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_end_angle, ARC_END, TFT_BLACK, DARKER_GREY);
+        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
+        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, ARC_START, new_start_angle, TFT_BLACK, DARKER_GREY); 
+        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_end_angle, ARC_END, TFT_BLACK, DARKER_GREY);
         goto cleanup;
     }
 
     if (new_end_angle <= last_start_angle) {
-        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_start_angle, last_end_angle, TFT_BLACK, DARKER_GREY);
-        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
+        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_start_angle, last_end_angle, TFT_BLACK, DARKER_GREY);
+        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
         goto cleanup;
     }
 
     if (new_start_angle >= last_end_angle) {
-        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_start_angle, last_end_angle, TFT_BLACK, DARKER_GREY);
-        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
+        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_start_angle, last_end_angle, TFT_BLACK, DARKER_GREY);
+        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
         goto cleanup;
     }
 
     if (new_end_angle < last_end_angle) {
-        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_end_angle, last_end_angle, TFT_BLACK, DARKER_GREY);
+        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_end_angle, last_end_angle, TFT_BLACK, DARKER_GREY);
     }
 
     if (new_start_angle > last_start_angle) {
-        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_start_angle, new_start_angle, TFT_BLACK, DARKER_GREY);
+        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_start_angle, new_start_angle, TFT_BLACK, DARKER_GREY);
     }
 
     if (meter_last_color != color) {
-        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
+        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
         goto cleanup;
     } 
     
     if (new_end_angle > last_end_angle) {
-        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_end_angle, new_end_angle, color, TFT_BLACK);
+        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_end_angle, new_end_angle, color, TFT_BLACK);
     } 
 
     if (new_start_angle < last_start_angle) {
-        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, last_start_angle, color, TFT_BLACK);
+        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, last_start_angle, color, TFT_BLACK);
     } 
 
 cleanup:
@@ -91,7 +91,7 @@ void Menu::updateHeading(float heading, uint16_t color, bool init) {
     String text = "??";
 
     if (color != last_color || init) {
-        small_font_spr.setTextColor(color, DARKER_GREY);
+        this->_small_font_spr->setTextColor(color, DARKER_GREY);
         last_color = color;
     }
 
@@ -105,11 +105,11 @@ void Menu::updateHeading(float heading, uint16_t color, bool init) {
     else if (heading > 292.5 && heading <= 337.5)   {text = "NW";}
     else {text = "ERR";}
 
-    width = small_font_spr.textWidth(text);
-    height = small_font_spr.fontHeight();
+    width = this->_small_font_spr->textWidth(text);
+    height = this->_small_font_spr->fontHeight();
 
-    tft.setCursor(SCREEN_CENTER - width/2, tft.height() - height);
-    small_font_spr.printToSprite(text);
+    this->_tft->setCursor(SCREEN_CENTER - width/2, this->_tft->height() - height);
+    this->_small_font_spr->printToSprite(text);
 
 }
 
@@ -118,21 +118,21 @@ void Menu::updateCentralText(String str, uint16_t color, bool init) {
     uint16_t width, height;
     
     if (color != last_color || init) {
-        large_font_spr.setTextColor(color, DARKER_GREY);
+        this->_large_font_spr->setTextColor(color, DARKER_GREY);
         last_color = color;
     }
 
     if (str.length() <= 1) {str = " " + str + " ";}
 
-    width = large_font_spr.textWidth(str);
-    height = large_font_spr.fontHeight();
+    width = this->_large_font_spr->textWidth(str);
+    height = this->_large_font_spr->fontHeight();
 
     // TODO: Update only relevant boxes for optimisation
-    if (last_width > width) {tft.fillRect(SCREEN_CENTER - last_width/2, SCREEN_CENTER - height/2, last_width, height, DARKER_GREY);}
+    if (last_width > width) {this->_tft->fillRect(SCREEN_CENTER - last_width/2, SCREEN_CENTER - height/2, last_width, height, DARKER_GREY);}
     last_width = width;
 
-    tft.setCursor(SCREEN_CENTER - width/2, SCREEN_CENTER - height/2);
-    large_font_spr.printToSprite(str);
+    this->_tft->setCursor(SCREEN_CENTER - width/2, SCREEN_CENTER - height/2);
+    this->_large_font_spr->printToSprite(str);
 }
 
 void Menu::update(screen_data_t data, bool init) {
