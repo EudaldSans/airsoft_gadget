@@ -29,12 +29,13 @@
 #include "menus.h"
 
 uint16_t total_ammo = 30, current_ammo = 30;
+bool init_menu = true;
 
 HMC5883L mag;
 int16_t mx, my, mz;
 
 Menu* menus[NUMBER_OF_MENUS];
-uint8_t current_menu = KDR_MENU;
+uint8_t current_menu = DEC_AMMO_MENU;
 
 void shot_detected_ISR(void);
 void btn0_ISR(void); 
@@ -71,8 +72,6 @@ void setup(void) {
     menus[INC_AMMO_MENU]    = new IncreasingAmmoMenu();
     menus[KDR_MENU]         = new KDRMenu();
 
-    menus[current_menu]->update(data, true);
-
     attachInterrupt(15, shot_detected_ISR, FALLING);
     attachInterrupt(0, btn0_ISR, FALLING);
 }
@@ -93,7 +92,8 @@ void loop() {
     data.heading = heading;
 
     // dec_ammo_menu->update(data, false);
-    menus[current_menu]->update(data, false);
+    menus[current_menu]->update(data, init_menu);
+    init_menu = false;
 
     delay(200);
 }
@@ -106,6 +106,9 @@ void IRAM_ATTR shot_detected_ISR(void) {
 void IRAM_ATTR btn0_ISR(void) {
     current_menu++;
     if (current_menu >= NUMBER_OF_MENUS) {current_menu = 0;}
+    init_menu = true;
+
+    // menus[current_menu]->btn0();
 }
 
 

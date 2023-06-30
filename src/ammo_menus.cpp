@@ -34,7 +34,7 @@ void IncreasingAmmoMenu::update(screen_data_t data, bool init) {
     static uint32_t color = TFT_GREEN;
     float current_ratio = (float)data.current_ammo / data.total_ammo;
     uint16_t meter_angle =  360 - (300 * current_ratio + 30);
-    String ammo_text = String(data.current_ammo, 10);
+    String ammo_text = String(data.total_ammo - data.current_ammo, 10);
     
     if (current_ratio > 0.5 && previous_ratio <= 0.5) { color = TFT_GREEN;} 
     else if (current_ratio > 0.25 && previous_ratio <= 0.5) {color = TFT_YELLOW;} 

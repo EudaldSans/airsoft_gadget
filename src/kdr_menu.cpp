@@ -23,7 +23,7 @@ void KDRMenu::update(screen_data_t data, bool init) {
     else if (kdr >= 0.5) {color = TFT_YELLOW;}
     else {color = TFT_RED;}
 
-    if (kdr > 100) {text = String((int)kdr, 10);}
+    if (kdr > 100 || (kdr == (int)kdr)) {text = String((int)kdr, 10);}
     else if (kdr > 10|| (10 * kdr == (int)(10 * kdr))) {text = String(kdr, 1);}
     else {text = String(kdr, 2);}
 
@@ -37,7 +37,10 @@ void KDRMenu::update(screen_data_t data, bool init) {
     Menu::updateHeading(data.heading, color, init);
 }
 
-void KDRMenu::btn0() {};
+void KDRMenu::btn0() {
+    this->kills++;
+};
+
 void KDRMenu::btn1() {};
 void KDRMenu::btn2() {};
 

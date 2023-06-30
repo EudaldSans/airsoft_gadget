@@ -35,23 +35,6 @@ Menu::Menu() {
     small_font_spr.setColorDepth(16); 
 }
 
-void Menu::updateAmoCounter(uint16_t ammo, uint16_t color, bool init) {
-    static uint16_t last_color = TFT_GREEN;
-    uint16_t width, height;
-    String text;
-
-    if (color != last_color || init) {large_font_spr.setTextColor(color, DARKER_GREY);}
-    
-    if (ammo >= 100) {text = " " + (String) ammo + " ";}
-    else {text = "  " + (String) ammo + "  ";}
-
-    width = large_font_spr.textWidth(text);
-    height = large_font_spr.fontHeight();
-    
-    tft.setCursor(SCREEN_CENTER - width/2, SCREEN_CENTER - height/2);
-    large_font_spr.printToSprite(text);
-}
-
 void Menu::updateArcMeter(uint16_t new_start_angle, uint16_t new_end_angle, uint16_t color, bool init) {
     static uint16_t last_end_angle = 30, last_start_angle = 330;
     static uint16_t meter_last_color = TFT_GREEN;
@@ -60,30 +43,43 @@ void Menu::updateArcMeter(uint16_t new_start_angle, uint16_t new_end_angle, uint
         tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
         tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, ARC_START, new_start_angle, TFT_BLACK, DARKER_GREY); 
         tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_end_angle, ARC_END, TFT_BLACK, DARKER_GREY);
+        goto cleanup;
+    }
 
-        last_end_angle = new_end_angle;
-        last_start_angle = new_start_angle;
-        meter_last_color = color;
+    if (new_end_angle <= last_start_angle) {
+        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_start_angle, last_end_angle, TFT_BLACK, DARKER_GREY);
+        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
+        goto cleanup;
+    }
 
-        return;
+    if (new_start_angle >= last_end_angle) {
+        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_start_angle, last_end_angle, TFT_BLACK, DARKER_GREY);
+        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
+        goto cleanup;
+    }
+
+    if (new_end_angle < last_end_angle) {
+        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_end_angle, last_end_angle, TFT_BLACK, DARKER_GREY);
+    }
+
+    if (new_start_angle > last_start_angle) {
+        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_start_angle, new_start_angle, TFT_BLACK, DARKER_GREY);
     }
 
     if (meter_last_color != color) {
         tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
+        goto cleanup;
     } 
     
     if (new_end_angle > last_end_angle) {
         tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_end_angle, new_end_angle, color, TFT_BLACK);
-    } else {
-        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_end_angle, last_end_angle, TFT_BLACK, DARKER_GREY);
-    }
+    } 
 
     if (new_start_angle < last_start_angle) {
         tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, last_start_angle, color, TFT_BLACK);
-    } else {
-        tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_start_angle, new_start_angle, TFT_BLACK, DARKER_GREY);
-    }
+    } 
 
+cleanup:
     last_end_angle = new_end_angle;
     last_start_angle = new_start_angle;
     meter_last_color = color;
@@ -94,11 +90,10 @@ void Menu::updateHeading(float heading, uint16_t color, bool init) {
     uint16_t width, height;
     String text = "??";
 
-    Serial.print("Updating heading: ");
-    Serial.print(heading);
-    Serial.print("\n");
-
-    if (color != last_color || init) {small_font_spr.setTextColor(color, DARKER_GREY);}
+    if (color != last_color || init) {
+        small_font_spr.setTextColor(color, DARKER_GREY);
+        last_color = color;
+    }
 
     if (heading <= 22.5 || heading > 337.5)         {text = "  N  ";}
     else if (heading > 22.5 && heading <= 67.5)     {text = "NE";}
@@ -115,39 +110,24 @@ void Menu::updateHeading(float heading, uint16_t color, bool init) {
 
     tft.setCursor(SCREEN_CENTER - width/2, tft.height() - height);
     small_font_spr.printToSprite(text);
-}
 
-void Menu::updateKDR(float kdr, uint16_t color, bool init) {
-    static uint16_t last_color = TFT_GREEN;
-    uint16_t width, height;
-    String text;
-
-    if (color != last_color || init) {large_font_spr.setTextColor(color, DARKER_GREY);}
-    last_color = color;
-
-    if (kdr > 100) {text = String(kdr, 0);}
-    else if (kdr > 10) {text = String(kdr, 1);}
-    else {text = String(kdr, 2);}
-
-    width = large_font_spr.textWidth(text);
-    height = large_font_spr.fontHeight();
-    
-    tft.setCursor(SCREEN_CENTER - width/2, SCREEN_CENTER - height/2);
-    large_font_spr.printToSprite(text);
 }
 
 void Menu::updateCentralText(String str, uint16_t color, bool init) {
     static uint16_t last_width = 0, last_color = TFT_GREEN;
     uint16_t width, height;
     
-    Serial.print("Updating central text to: ");
-    Serial.println(str);
+    if (color != last_color || init) {
+        large_font_spr.setTextColor(color, DARKER_GREY);
+        last_color = color;
+    }
 
-    if (color != last_color || init) {large_font_spr.setTextColor(color, DARKER_GREY);}
+    if (str.length() <= 1) {str = " " + str + " ";}
 
     width = large_font_spr.textWidth(str);
     height = large_font_spr.fontHeight();
 
+    // TODO: Update only relevant boxes for optimisation
     if (last_width > width) {tft.fillRect(SCREEN_CENTER - last_width/2, SCREEN_CENTER - height/2, last_width, height, DARKER_GREY);}
     last_width = width;
 
@@ -155,7 +135,10 @@ void Menu::updateCentralText(String str, uint16_t color, bool init) {
     large_font_spr.printToSprite(str);
 }
 
-void Menu::update(screen_data_t data, bool init) {Serial.println("Called menu Update!");}
+void Menu::update(screen_data_t data, bool init) {
+    Menu::updateCentralText("ERR", TFT_RED, true);
+    Serial.println("Called menu Update!");
+}
 
 void Menu::btn0()         {Serial.println("Called menu btn0!");}
 void Menu::btn1()         {Serial.println("Called menu btn1!");}
