@@ -34,24 +34,26 @@
 
 TFT_eSPI tft = TFT_eSPI();
 
-uint16_t total_ammo = 30, current_ammo = 30;
 bool init_menu = true;
 
 HMC5883L mag;
-int16_t mx, my, mz;
 
 Menu* menus[NUMBER_OF_MENUS];
-uint8_t current_menu = DEC_AMMO_MENU;
+uint8_t current_menu = AMMO_MENU;
+
+screen_data_t data = {
+    .total_ammo = 30,
+    .current_ammo = 30,
+    .total_shots = 0,
+    .speed = 0,
+    .heading = 0
+};
+
 
 void shot_detected_ISR(void);
 void btn0_ISR(void); 
 
 void setup(void) {
-    screen_data_t data = {0};
-    data.current_ammo = current_ammo;
-    data.total_ammo = total_ammo;
-    data.heading = 0;
-
     Serial.begin(115200);
     Serial.println("Start");
 
@@ -84,14 +86,11 @@ void setup(void) {
     // dec_ammo_menu = new DecreasingAmmoMenu;
     // dec_ammo_menu->update(data, true);
 
-    menus[DEC_AMMO_MENU]    = new DecreasingAmmoMenu(&tft);
+    menus[AMMO_MENU]        = new AmmoMenu(&tft);
     tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 70, 100, TFT_RED, TFT_BLACK);
     // delay(100);
-    menus[INC_AMMO_MENU]    = new IncreasingAmmoMenu(&tft);
-    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 100, 130, TFT_RED, TFT_BLACK);
-    // delay(100);
     menus[KDR_MENU]         = new KDRMenu(&tft);
-    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 130, 160, TFT_RED, TFT_BLACK);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 100, 160, TFT_RED, TFT_BLACK);
     // delay(100);
 
     attachInterrupt(15, shot_detected_ISR, FALLING);
@@ -111,9 +110,8 @@ void setup(void) {
 
 
 void loop() {
-    screen_data_t data = {0};
-    data.current_ammo = current_ammo;
-    data.total_ammo = total_ammo;
+    int16_t mx, my, mz;
+    
     // read raw heading measurements from device
     mag.getHeading(&mx, &my, &mz);
     
@@ -133,10 +131,14 @@ void loop() {
 
 
 void IRAM_ATTR shot_detected_ISR(void) {
-    if (current_ammo > 0) {current_ammo--;}
+    if (data.current_ammo > 0) {data.current_ammo--;}
+    data.total_shots++;
 }
 
 void IRAM_ATTR btn0_ISR(void) {
+    menus[current_menu]->btn1();
+    return;
+
     current_menu++;
     if (current_menu >= NUMBER_OF_MENUS) {current_menu = 0;}
     init_menu = true;

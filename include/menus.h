@@ -14,17 +14,18 @@
 typedef struct {
     uint16_t total_ammo;
     uint16_t current_ammo;
+    uint16_t total_shots;
     uint16_t speed;  // TODO: maybe uint16_t is not the appropriate type, check later.
     float heading;
 } screen_data_t;
 
 
 typedef enum {
-    DEC_AMMO_MENU = 0,
-    INC_AMMO_MENU,
+    AMMO_MENU = 0,
     KDR_MENU,
     NUMBER_OF_MENUS
 } menu_t;
+
 
 class Menu {
     public:
@@ -56,31 +57,21 @@ class Menu {
         String title = "ERR";
 };
 
-class DecreasingAmmoMenu : public Menu {
+class AmmoMenu : public Menu {
     public:
-        DecreasingAmmoMenu(TFT_eSPI* p_tft);
+        AmmoMenu(TFT_eSPI* p_tft);
 
         void update(screen_data_t data, bool init);
 
         bool reload = true;
 
-    private:
-        String title = "DecAmmo";
-};
-
-
-class IncreasingAmmoMenu : public Menu {
-    public:
-        IncreasingAmmoMenu(TFT_eSPI* p_tft);
-
-        void update(screen_data_t data, bool init);
-
-        bool reload = true;
+        void btn1();
+        void btn2();
 
     private:
-        String title = "IncAmmo";
+        String title = "Ammo";
+        uint8_t counting_mode;
 };
-
 
 class KDRMenu : public Menu {
     public:
