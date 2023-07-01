@@ -22,13 +22,14 @@
 
 Menu::Menu(TFT_eSPI* p_tft) {
     this->_tft = p_tft;
-    this->_large_font_spr = new TFT_eSprite(p_tft);
-    this->_small_font_spr = new TFT_eSprite(p_tft);
 
-    this->_large_font_spr->loadFont(FONT_75p);
-    this->_large_font_spr->setColorDepth(16);
-    this->_small_font_spr->loadFont(FONT_28p);   
-    this->_small_font_spr->setColorDepth(16); 
+    this->_tft->loadFont(BlackOpsOne28);
+    this->small_font_height = this->_tft->fontHeight();
+    this->_tft->unloadFont(); 
+
+    this->_tft->loadFont(BlackOpsOne75);
+    this->large_font_height = this->_tft->fontHeight();
+    this->_tft->unloadFont(); 
 }
 
 void Menu::updateArcMeter(uint16_t new_start_angle, uint16_t new_end_angle, uint16_t color, bool init) {
@@ -78,7 +79,6 @@ cleanup:
 void Menu::updateHeading(float heading, uint16_t color, bool init) {
     static uint16_t last_color = TFT_GREEN;
     static String previous_str = "";
-    uint16_t width, height;
     String str = "??";
 
     if (heading <= 22.5 || heading > 337.5)         {str = "  N  ";}
@@ -92,7 +92,7 @@ void Menu::updateHeading(float heading, uint16_t color, bool init) {
     else {str = "ERR";}
 
     if (color != last_color || init) {
-        this->_small_font_spr->setTextColor(color, DARKER_GREY);
+        this->_tft->setTextColor(color, DARKER_GREY);
         last_color = color;
     } else if (str == previous_str) {
         return;
@@ -115,7 +115,6 @@ void Menu::updateHeading(float heading, uint16_t color, bool init) {
 void Menu::updateCentralText(String str, uint16_t color, bool init) {
     static uint16_t last_width = 0, last_color = TFT_GREEN;
     static String previous_str = "";
-    uint16_t width, height;
     
     if (color != last_color || init) {
         this->_tft->setTextColor(color, DARKER_GREY);
@@ -138,7 +137,33 @@ void Menu::updateCentralText(String str, uint16_t color, bool init) {
     previous_str = str;
 }
 
+void Menu::updateMenuTitle(String str, uint16_t color, bool init) {
+    static uint16_t last_color = TFT_GREEN;
+    static String previous_str = "";
+    uint16_t width, height;
+    
+    if (color != last_color || init) {
+        this->_tft->setTextColor(color, DARKER_GREY);
+        last_color = color;
+    } else if (str == previous_str) {
+        return;
+    }
+
+    this->_tft->loadFont(BlackOpsOne28);
+    this->_tft->setCursor(SCREEN_CENTER, SCREEN_CENTER);
+    this->_tft->setTextDatum(BC_DATUM);
+    this->_tft->setTextColor(DARKER_GREY);
+    this->_tft->drawString(previous_str, SCREEN_CENTER, SCREEN_CENTER - (this->large_font_height / 2));
+    this->_tft->setTextColor(color);
+    this->_tft->drawString(str, SCREEN_CENTER, SCREEN_CENTER - (this->large_font_height / 2));
+
+    this->_tft->unloadFont();
+
+    previous_str = str;
+}
+
 void Menu::update(screen_data_t data, bool init) {
+    Menu::updateMenuTitle(this->title, TFT_RED, true);
     Menu::updateCentralText("ERR", TFT_RED, true);
     Serial.println("Called menu Update!");
 }

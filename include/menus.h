@@ -48,11 +48,12 @@ class Menu {
         void updateAmoCounter(uint16_t ammo, uint16_t color, bool init);
         void updateKDR(float kdr, uint16_t color, bool init);
         void updateCentralText(String str, uint16_t color, bool init);
+        void updateMenuTitle(String str, uint16_t color, bool init);
 
     private:
         TFT_eSPI* _tft;
-        TFT_eSprite* _large_font_spr;
-        TFT_eSprite* _small_font_spr;
+        uint16_t small_font_height, large_font_height;
+        String title = "ERR";
 };
 
 class DecreasingAmmoMenu : public Menu {
@@ -62,6 +63,9 @@ class DecreasingAmmoMenu : public Menu {
         void update(screen_data_t data, bool init);
 
         bool reload = true;
+
+    private:
+        String title = "DecAmmo";
 };
 
 
@@ -72,6 +76,9 @@ class IncreasingAmmoMenu : public Menu {
         void update(screen_data_t data, bool init);
 
         bool reload = true;
+
+    private:
+        String title = "IncAmmo";
 };
 
 
@@ -90,4 +97,5 @@ class KDRMenu : public Menu {
     private:
         uint16_t kills;
         uint16_t deaths;
+        String title = "KDR";
 };

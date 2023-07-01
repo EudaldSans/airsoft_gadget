@@ -22,6 +22,7 @@ void DecreasingAmmoMenu::update(screen_data_t data, bool init) {
     Menu::updateArcMeter(ARC_START, meter_angle, color, init);
     Menu::updateCentralText(ammo_text, color, init);
     Menu::updateHeading(data.heading, color, init);  
+    Menu::updateMenuTitle(this->title, color, init);
 
     previous_ratio = current_ratio;
 }
@@ -43,6 +44,7 @@ void IncreasingAmmoMenu::update(screen_data_t data, bool init) {
     Menu::updateArcMeter(meter_angle, ARC_END, color, init);
     Menu::updateCentralText(ammo_text, color, init);
     Menu::updateHeading(data.heading, color, init);  
+    Menu::updateMenuTitle(this->title, color, init);
 
     previous_ratio = current_ratio;
 }
