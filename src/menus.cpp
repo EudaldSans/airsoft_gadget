@@ -77,52 +77,65 @@ cleanup:
 
 void Menu::updateHeading(float heading, uint16_t color, bool init) {
     static uint16_t last_color = TFT_GREEN;
+    static String previous_str = "";
     uint16_t width, height;
-    String text = "??";
+    String str = "??";
+
+    if (heading <= 22.5 || heading > 337.5)         {str = "  N  ";}
+    else if (heading > 22.5 && heading <= 67.5)     {str = "NE";}
+    else if (heading > 67.5 && heading <= 112.5)    {str = "  E  ";}
+    else if (heading > 112.5 && heading <= 157.5)   {str = "SE";}
+    else if (heading > 157.5 && heading <= 202.5)   {str = "  S  ";}
+    else if (heading > 202.5 && heading <= 247.5)   {str = "SW";}
+    else if (heading > 247.5 && heading <= 292.5)   {str = "  W  ";}
+    else if (heading > 292.5 && heading <= 337.5)   {str = "NW";}
+    else {str = "ERR";}
 
     if (color != last_color || init) {
         this->_small_font_spr->setTextColor(color, DARKER_GREY);
         last_color = color;
+    } else if (str == previous_str) {
+        return;
     }
 
-    if (heading <= 22.5 || heading > 337.5)         {text = "  N  ";}
-    else if (heading > 22.5 && heading <= 67.5)     {text = "NE";}
-    else if (heading > 67.5 && heading <= 112.5)    {text = "  E  ";}
-    else if (heading > 112.5 && heading <= 157.5)   {text = "SE";}
-    else if (heading > 157.5 && heading <= 202.5)   {text = "  S  ";}
-    else if (heading > 202.5 && heading <= 247.5)   {text = "SW";}
-    else if (heading > 247.5 && heading <= 292.5)   {text = "  W  ";}
-    else if (heading > 292.5 && heading <= 337.5)   {text = "NW";}
-    else {text = "ERR";}
+    this->_tft->loadFont(BlackOpsOne28);
+    
+    this->_tft->setCursor(SCREEN_CENTER, SCREEN_CENTER);
+    this->_tft->setTextDatum(BC_DATUM);
+    this->_tft->setTextColor(DARKER_GREY);
+    this->_tft->drawString(previous_str, SCREEN_CENTER, this->_tft->height());
+    this->_tft->setTextColor(color);
+    this->_tft->drawString(str, SCREEN_CENTER, this->_tft->height());
 
-    width = this->_small_font_spr->textWidth(text);
-    height = this->_small_font_spr->fontHeight();
+    this->_tft->unloadFont();
 
-    this->_tft->setCursor(SCREEN_CENTER - width/2, this->_tft->height() - height);
-    this->_small_font_spr->printToSprite(text);
-
+    previous_str = str;
 }
 
 void Menu::updateCentralText(String str, uint16_t color, bool init) {
     static uint16_t last_width = 0, last_color = TFT_GREEN;
+    static String previous_str = "";
     uint16_t width, height;
     
     if (color != last_color || init) {
-        this->_large_font_spr->setTextColor(color, DARKER_GREY);
+        this->_tft->setTextColor(color, DARKER_GREY);
         last_color = color;
+    } else if (previous_str == str) {
+        return;
     }
 
-    if (str.length() <= 1) {str = " " + str + " ";}
+    this->_tft->loadFont(BlackOpsOne75);
+    
+    this->_tft->setCursor(SCREEN_CENTER, SCREEN_CENTER);
+    this->_tft->setTextDatum(CC_DATUM);
+    this->_tft->setTextColor(DARKER_GREY);
+    this->_tft->drawString(previous_str, SCREEN_CENTER, SCREEN_CENTER);
+    this->_tft->setTextColor(color);
+    this->_tft->drawString(str, SCREEN_CENTER, SCREEN_CENTER);
 
-    width = this->_large_font_spr->textWidth(str);
-    height = this->_large_font_spr->fontHeight();
+    this->_tft->unloadFont();
 
-    // TODO: Update only relevant boxes for optimisation
-    if (last_width > width) {this->_tft->fillRect(SCREEN_CENTER - last_width/2, SCREEN_CENTER - height/2, last_width, height, DARKER_GREY);}
-    last_width = width;
-
-    this->_tft->setCursor(SCREEN_CENTER - width/2, SCREEN_CENTER - height/2);
-    this->_large_font_spr->printToSprite(str);
+    previous_str = str;
 }
 
 void Menu::update(screen_data_t data, bool init) {
