@@ -3,8 +3,6 @@
 #include "BlackOpsOne75.h"
 #include "BlackOpsOne28.h"
 
-#include "logo.h"
-
 KDRMenu::KDRMenu(TFT_eSPI* p_tft): Menu(p_tft) {
     this->kills = 0;
     this->deaths = 0;

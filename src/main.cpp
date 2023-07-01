@@ -29,6 +29,8 @@
 #include "TFT_eSPI.h"
 
 #include "menus.h"
+#include "RTX_logo.h"
+
 
 TFT_eSPI tft = TFT_eSPI();
 
@@ -53,31 +55,58 @@ void setup(void) {
     Serial.begin(115200);
     Serial.println("Start");
 
+    tft.begin();
+    tft.setRotation(1);
+    tft.fillScreen(DARKER_GREY);
+    tft.drawXBitmap(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_logo_bitmap, RTX_LOGO_W, RTX_LOGO_H, TFT_RED);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 0, 30, TFT_RED, TFT_BLACK);
+
     // ammoScreenInit(30);
 
     Wire.setPins(22, 21);
     // join I2C bus (I2Cdev library doesn't do this automatically)
     Wire.begin();
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 30, 40, TFT_RED, TFT_BLACK);
+    // delay(100);
 
     // initialize device
     Serial.println("Initializing I2C devices...");
     mag.initialize();
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 40, 50, TFT_RED, TFT_BLACK);
+    // delay(100);
 
     // verify connection
     Serial.println("Testing device connections...");
     Serial.println(mag.testConnection() ? "HMC5883L connection successful" : "HMC5883L connection failed");
-
-    Serial.println("Starting DecreasingAmmoMenu");
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 50, 70, TFT_RED, TFT_BLACK);
+    // delay(100);
     
     // dec_ammo_menu = new DecreasingAmmoMenu;
     // dec_ammo_menu->update(data, true);
 
     menus[DEC_AMMO_MENU]    = new DecreasingAmmoMenu(&tft);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 70, 100, TFT_RED, TFT_BLACK);
+    // delay(100);
     menus[INC_AMMO_MENU]    = new IncreasingAmmoMenu(&tft);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 100, 130, TFT_RED, TFT_BLACK);
+    // delay(100);
     menus[KDR_MENU]         = new KDRMenu(&tft);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 130, 160, TFT_RED, TFT_BLACK);
+    // delay(100);
 
     attachInterrupt(15, shot_detected_ISR, FALLING);
     attachInterrupt(0, btn0_ISR, FALLING);
+
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 160, 190, TFT_RED, TFT_BLACK);
+    // delay(100);
+
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 190, 270, TFT_RED, TFT_BLACK);
+    // delay(500);
+
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 270, 360, TFT_RED, TFT_BLACK);
+    // delay(500);
+
+    tft.fillScreen(DARKER_GREY);
 }
 
 

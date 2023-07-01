@@ -25,10 +25,6 @@ Menu::Menu(TFT_eSPI* p_tft) {
     this->_large_font_spr = new TFT_eSprite(p_tft);
     this->_small_font_spr = new TFT_eSprite(p_tft);
 
-    this->_tft->begin();
-    this->_tft->setRotation(1);
-    this->_tft->fillScreen(DARKER_GREY);
-
     this->_large_font_spr->loadFont(FONT_75p);
     this->_large_font_spr->setColorDepth(16);
     this->_small_font_spr->loadFont(FONT_28p);   
@@ -46,13 +42,7 @@ void Menu::updateArcMeter(uint16_t new_start_angle, uint16_t new_end_angle, uint
         goto cleanup;
     }
 
-    if (new_end_angle <= last_start_angle) {
-        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_start_angle, last_end_angle, TFT_BLACK, DARKER_GREY);
-        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
-        goto cleanup;
-    }
-
-    if (new_start_angle >= last_end_angle) {
+    if (new_end_angle <= last_start_angle || new_start_angle >= last_end_angle) {
         this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_start_angle, last_end_angle, TFT_BLACK, DARKER_GREY);
         this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
         goto cleanup;
