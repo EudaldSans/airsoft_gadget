@@ -16,6 +16,7 @@ typedef struct {
     uint16_t current_ammo;
     uint16_t total_shots;
     uint16_t speed;  // TODO: maybe uint16_t is not the appropriate type, check later.
+    uint16_t max_speed;
     float heading;
 } screen_data_t;
 
@@ -23,6 +24,7 @@ typedef struct {
 typedef enum {
     AMMO_MENU = 0,
     KDR_MENU,
+    CHRONO_MENU,
     NUMBER_OF_MENUS
 } menu_t;
 
@@ -51,9 +53,10 @@ class Menu {
         void updateCentralText(String str, uint16_t color, bool init);
         void updateMenuTitle(String str, uint16_t color, bool init);
 
-    private:
         TFT_eSPI* _tft;
         uint16_t small_font_height, large_font_height;
+    
+    private:
         String title = "ERR";
 };
 
@@ -89,4 +92,20 @@ class KDRMenu : public Menu {
         uint16_t kills;
         uint16_t deaths;
         String title = "KDR";
+};
+
+class ChronoMenu : public Menu {
+    public:
+        ChronoMenu(TFT_eSPI* p_tft);
+
+        void update(screen_data_t data, bool init);
+
+        void btn1();
+        void btn2();
+
+        bool reload = false;
+
+    private:
+        uint16_t units;
+        String title = "Chrono";
 };

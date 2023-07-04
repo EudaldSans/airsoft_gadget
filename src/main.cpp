@@ -39,13 +39,14 @@ bool init_menu = true;
 HMC5883L mag;
 
 Menu* menus[NUMBER_OF_MENUS];
-uint8_t current_menu = AMMO_MENU;
+uint8_t current_menu = CHRONO_MENU;
 
 screen_data_t data = {
     .total_ammo = 30,
     .current_ammo = 30,
     .total_shots = 0,
-    .speed = 0,
+    .speed = 355,
+    .max_speed = 360,
     .heading = 0
 };
 
@@ -83,14 +84,14 @@ void setup(void) {
     tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 50, 70, TFT_RED, TFT_BLACK);
     // delay(100);
     
-    // dec_ammo_menu = new DecreasingAmmoMenu;
-    // dec_ammo_menu->update(data, true);
-
     menus[AMMO_MENU]        = new AmmoMenu(&tft);
     tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 70, 100, TFT_RED, TFT_BLACK);
     // delay(100);
     menus[KDR_MENU]         = new KDRMenu(&tft);
-    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 100, 160, TFT_RED, TFT_BLACK);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 100, 130, TFT_RED, TFT_BLACK);
+    // delay(100);
+    menus[CHRONO_MENU]      = new ChronoMenu(&tft);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 130, 160, TFT_RED, TFT_BLACK);
     // delay(100);
 
     attachInterrupt(15, shot_detected_ISR, FALLING);

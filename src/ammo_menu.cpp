@@ -1,10 +1,5 @@
 #include "menus.h"
 
-#include "BlackOpsOne75.h"
-#include "BlackOpsOne28.h"
-
-#include "logo.h"
-
 typedef enum {
     DECREASE_MODE = 0,
     INCREASE_MODE,
