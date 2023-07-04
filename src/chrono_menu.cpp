@@ -1,5 +1,8 @@
 #include "menus.h"
 
+#include "BlackOpsOne28.h"
+
+
 typedef enum {
     CHRONO_MPS = 0,
     CHRONO_FPS,
@@ -36,9 +39,37 @@ void ChronoMenu::update(screen_data_t data, bool init) {
     Menu::updateHeading(data.heading, color, init);  
     Menu::updateMenuTitle(this->title, color, init);
 
-    ChronoMenu::_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 247, 248, TFT_RED, TFT_BLACK);
+    Menu::_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 247, 248, TFT_RED, TFT_BLACK);
+
+    ChronoMenu::drawUnits(color, init);
 
     previous_ratio = current_ratio;
+}
+
+void ChronoMenu::drawUnits(uint16_t color, bool init) {
+    static uint16_t previous_color = TFT_GREEN;
+    static chrono_units_t previous_unit = CHRONO_FPS;
+
+    if (previous_color == color && previous_unit == this->units && init == false) {return;}
+
+    Menu::_tft->loadFont(BlackOpsOne28);
+    
+    Menu::_tft->setCursor(SCREEN_CENTER, SCREEN_CENTER);
+    Menu::_tft->setTextDatum(TL_DATUM);
+    Menu::_tft->setTextColor(DARKER_GREY);
+   
+    if (previous_unit == CHRONO_MPS) {Menu::_tft->drawString("m/s", SCREEN_CENTER, SCREEN_CENTER + this->large_font_height / 2);}
+    else if (previous_unit == CHRONO_FPS) {Menu::_tft->drawString("fps", SCREEN_CENTER, SCREEN_CENTER + this->large_font_height / 2);}
+   
+    Menu::_tft->setTextColor(color);
+   
+    if (this->units == CHRONO_MPS) {Menu::_tft->drawString("m/s", SCREEN_CENTER, SCREEN_CENTER + this->large_font_height / 2);}
+    else if (this->units == CHRONO_FPS) {Menu::_tft->drawString("fps", SCREEN_CENTER, SCREEN_CENTER + this->large_font_height / 2);}
+
+    Menu::_tft->unloadFont();
+    
+    previous_color = color;
+    previous_unit = (chrono_units_t) this->units;
 }
 
 void ChronoMenu::btn1() {

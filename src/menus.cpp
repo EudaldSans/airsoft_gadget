@@ -168,6 +168,8 @@ void Menu::update(screen_data_t data, bool init) {
     Serial.println("Called menu Update!");
 }
 
+void Menu::clear() {Serial.println("Called menu clear!");}
+
 void Menu::btn0()         {Serial.println("Called menu btn0!");}
 void Menu::btn1()         {Serial.println("Called menu btn1!");}
 void Menu::btn2()         {Serial.println("Called menu btn2!");}

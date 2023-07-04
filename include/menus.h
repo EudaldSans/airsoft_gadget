@@ -35,6 +35,7 @@ class Menu {
         virtual ~Menu(){};
 
         virtual void update(screen_data_t data, bool init);
+        virtual void clear();
 
         virtual void btn0();
         virtual void btn1();
@@ -106,6 +107,8 @@ class ChronoMenu : public Menu {
         bool reload = false;
 
     private:
+        void drawUnits(uint16_t color, bool init);
+        
         uint16_t units;
         String title = "Chrono";
 };
