@@ -108,6 +108,7 @@ class ChronoMenu : public Menu {
 
     private:
         void drawUnits(uint16_t color, bool init);
+        void clear();
         
         uint16_t units;
         String title = "Chrono";

@@ -81,3 +81,15 @@ void ChronoMenu::btn2() {
     this->units--;
     if (this->units <= 0) {this->units = NUMBER_OF_UNITS - 1;}
 }
+
+void ChronoMenu::clear() {
+    Menu::_tft->loadFont(BlackOpsOne28);
+    Menu::_tft->setCursor(SCREEN_CENTER, SCREEN_CENTER);
+    Menu::_tft->setTextDatum(TL_DATUM);
+    Menu::_tft->setTextColor(DARKER_GREY);
+   
+    if (this->units == CHRONO_MPS) {Menu::_tft->drawString("m/s", SCREEN_CENTER, SCREEN_CENTER + this->large_font_height / 2);}
+    else if (this->units == CHRONO_FPS) {Menu::_tft->drawString("fps", SCREEN_CENTER, SCREEN_CENTER + this->large_font_height / 2);}
+   
+    Menu::_tft->unloadFont();
+}
