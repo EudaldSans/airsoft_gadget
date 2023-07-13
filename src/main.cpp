@@ -31,10 +31,17 @@
 #include "menus.h"
 #include "RTX_logo.h"
 
+#define ENCODER_KEY     15
+#define ENCODER_1       23
+#define ENCODER_2       19      
+
 
 TFT_eSPI tft = TFT_eSPI();
 
 bool init_menu = true;
+bool encoder_s1_triggered = false, encoder_s2_triggered = false;
+
+unsigned long last_encoder_change = 0;
 
 HMC5883L mag;
 
@@ -53,6 +60,11 @@ screen_data_t data = {
 
 void shot_detected_ISR(void);
 void btn0_ISR(void); 
+
+void encoder_1_ISR(void);
+void encoder_2_ISR(void);
+void encoder_key_pressed_ISR(void);
+void encoder_keu_released_ISR(void);
 
 void setup(void) {
     Serial.begin(115200);
@@ -94,8 +106,14 @@ void setup(void) {
     tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 130, 160, TFT_RED, TFT_BLACK);
     // delay(100);
 
-    attachInterrupt(15, shot_detected_ISR, FALLING);
+    pinMode(ENCODER_KEY, INPUT_PULLUP);
+    pinMode(ENCODER_1, INPUT);
+    pinMode(ENCODER_2, INPUT);
+
+    // attachInterrupt(15, shot_detected_ISR, FALLING);
     attachInterrupt(0, btn0_ISR, FALLING);
+    attachInterrupt(ENCODER_KEY, encoder_key_ISR, FALLING);
+    attachInterrupt(ENCODER_1, encoder_1_ISR, FALLING);
 
     tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 160, 190, TFT_RED, TFT_BLACK);
     // delay(100);
@@ -145,6 +163,34 @@ void IRAM_ATTR btn0_ISR(void) {
     init_menu = true;
 
     // menus[current_menu]->btn0();
+}
+
+void IRAM_ATTR encoder_1_ISR(void) {
+    unsigned long now = millis();
+
+    // Debounce ISR
+    if (now - last_encoder_change <= 100) {return;}
+    
+    // Since ISR activates on falling edge, ig ENCODER_2 is 1 we ar turning CW, otherwise CCW
+    if (digitalRead(ENCODER_2)) { // Turning clock wise
+        current_menu++;
+        if (current_menu >= NUMBER_OF_MENUS) {current_menu = 0;}
+        init_menu = true;
+    } else { // turning counter clock wise
+        current_menu--;
+        if (current_menu >= NUMBER_OF_MENUS) {current_menu = NUMBER_OF_MENUS - 1;}
+        init_menu = true;
+    }
+
+    last_encoder_change = now;
+}
+
+void IRAM_ATTR encoder_key_pressed_ISR(void) {
+    return;
+}
+
+void IRAM_ATTR encoder_key_released_ISR(void) {
+    return;
 }
 
 
