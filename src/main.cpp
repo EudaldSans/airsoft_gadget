@@ -211,11 +211,9 @@ void IRAM_ATTR encoder_key_event_ISR(void) {
     if (now - last_event < 50) {return;}
 
     if (digitalRead(ENCODER_KEY)) {
-        if ((now - last_encoder_press) < LONG_PRESS_TIME_MS) {
-            inside_menu = menus[current_menu]->scrollKey();
-        } else {
-            long_press = true;
-        }
+        if ((now - last_encoder_press) < LONG_PRESS_TIME_MS)    {inside_menu = menus[current_menu]->scrollKey();} 
+        else                                                    {long_press = true;}
+    
     } else {
         last_encoder_press = millis();
     }
