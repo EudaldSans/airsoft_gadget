@@ -38,12 +38,12 @@ void AmmoMenu::update(screen_data_t data, bool init) {
     previous_ratio = current_ratio;
 }
 
-void AmmoMenu::btn1() {
+void AmmoMenu::scrollUp() {
     this->counting_mode++;
     if (this->counting_mode >= NUMBER_OF_MODES) {this->counting_mode = 0;}
 }
 
-void AmmoMenu::btn2() {
+void AmmoMenu::scrollDown() {
     this->counting_mode--;
     if (this->counting_mode <= 0) {this->counting_mode = NUMBER_OF_MODES - 1;}
 }

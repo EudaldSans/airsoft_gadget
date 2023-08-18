@@ -72,12 +72,12 @@ void ChronoMenu::drawUnits(uint16_t color, bool init) {
     previous_unit = (chrono_units_t) this->units;
 }
 
-void ChronoMenu::btn1() {
+void ChronoMenu::scrollUp() {
     this->units++;
     if (this->units >= NUMBER_OF_UNITS) {this->units = 0;}
 }
 
-void ChronoMenu::btn2() {
+void ChronoMenu::scrollDown() {
     this->units--;
     if (this->units <= 0) {this->units = NUMBER_OF_UNITS - 1;}
 }

@@ -176,3 +176,9 @@ void Menu::btn2()         {Serial.println("Called menu btn2!");}
 
 void Menu::scrollUp()     {Serial.println("Called menu ScrollUp!");}
 void Menu::scrollDown()   {Serial.println("Called menu scrollDown!");}
+
+bool Menu::scrollKey()    {
+    Serial.println("Called menu ScrollKey");
+    this->menu_active = !this->menu_active;
+    return this->menu_active;
+}

@@ -35,13 +35,12 @@
 #define ENCODER_1       23
 #define ENCODER_2       19      
 
+#define LONG_PRESS_TIME_MS      3000
+
 
 TFT_eSPI tft = TFT_eSPI();
 
-bool init_menu = true;
-bool encoder_s1_triggered = false, encoder_s2_triggered = false;
-
-unsigned long last_encoder_change = 0;
+bool init_menu = true, inside_menu = false, long_press = true;
 
 HMC5883L mag;
 
@@ -63,8 +62,7 @@ void btn0_ISR(void);
 
 void encoder_1_ISR(void);
 void encoder_2_ISR(void);
-void encoder_key_pressed_ISR(void);
-void encoder_keu_released_ISR(void);
+void encoder_key_event_ISR(void);
 
 void setup(void) {
     Serial.begin(115200);
@@ -112,7 +110,7 @@ void setup(void) {
 
     // attachInterrupt(15, shot_detected_ISR, FALLING);
     attachInterrupt(0, btn0_ISR, FALLING);
-    attachInterrupt(ENCODER_KEY, encoder_key_ISR, FALLING);
+    attachInterrupt(ENCODER_KEY, encoder_key_event_ISR, CHANGE);
     attachInterrupt(ENCODER_1, encoder_1_ISR, FALLING);
 
     tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 160, 190, TFT_RED, TFT_BLACK);
@@ -131,6 +129,7 @@ void setup(void) {
 void loop() {
     int16_t mx, my, mz;
     
+    
     // read raw heading measurements from device
     mag.getHeading(&mx, &my, &mz);
     
@@ -145,7 +144,18 @@ void loop() {
     menus[current_menu]->update(data, init_menu);
     init_menu = false;
 
-    delay(200);
+    // if (pressed) {
+    //     Serial.print("Encoder press @: ");
+    //     Serial.println(last_encoder_press);
+    //     pressed = false;
+    // }
+
+    if (long_press) {
+        Serial.println("Encoder long press");
+        long_press = false;
+    }
+
+    delay(100);
 }
 
 
@@ -166,32 +176,53 @@ void IRAM_ATTR btn0_ISR(void) {
 }
 
 void IRAM_ATTR encoder_1_ISR(void) {
+    static unsigned long last_encoder_change = 0;
     unsigned long now = millis();
 
     // Debounce ISR
     if (now - last_encoder_change <= 100) {return;}
     
-    // Since ISR activates on falling edge, ig ENCODER_2 is 1 we ar turning CW, otherwise CCW
+    // Since ISR activates on falling edge, if ENCODER_2 is 1 we ar turning CW, otherwise CCW
     if (digitalRead(ENCODER_2)) { // Turning clock wise
-        current_menu++;
-        if (current_menu >= NUMBER_OF_MENUS) {current_menu = 0;}
-        init_menu = true;
+        if (inside_menu) {
+            menus[current_menu]->scrollUp();
+        } else {
+            current_menu++;
+            if (current_menu >= NUMBER_OF_MENUS) {current_menu = 0;}
+            init_menu = true;
+        }
     } else { // turning counter clock wise
-        current_menu--;
-        if (current_menu >= NUMBER_OF_MENUS) {current_menu = NUMBER_OF_MENUS - 1;}
-        init_menu = true;
+        if (inside_menu) {
+            menus[current_menu]->scrollUp();
+        } else {
+            current_menu--;
+            if (current_menu >= NUMBER_OF_MENUS) {current_menu = NUMBER_OF_MENUS - 1;}
+            init_menu = true;
+        }
     }
 
     last_encoder_change = now;
 }
 
-void IRAM_ATTR encoder_key_pressed_ISR(void) {
-    return;
+void IRAM_ATTR encoder_key_event_ISR(void) {
+    static unsigned long last_encoder_press = 0, last_event = 0;
+    unsigned long now = millis();
+
+    if (now - last_event < 50) {return;}
+
+    if (digitalRead(ENCODER_KEY)) {
+        if ((now - last_encoder_press) < LONG_PRESS_TIME_MS) {
+            inside_menu = menus[current_menu]->scrollKey();
+        } else {
+            long_press = true;
+        }
+    } else {
+        last_encoder_press = millis();
+    }
+
+    last_event = now;
 }
 
-void IRAM_ATTR encoder_key_released_ISR(void) {
-    return;
-}
 
 
 

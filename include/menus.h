@@ -43,6 +43,7 @@ class Menu {
 
         virtual void scrollUp();
         virtual void scrollDown();
+        virtual bool scrollKey();
 
         bool reload = false;
     
@@ -56,6 +57,7 @@ class Menu {
 
         TFT_eSPI* _tft;
         uint16_t small_font_height, large_font_height;
+        bool menu_active = false;
     
     private:
         String title = "ERR";
@@ -69,8 +71,8 @@ class AmmoMenu : public Menu {
 
         bool reload = true;
 
-        void btn1();
-        void btn2();
+        void scrollUp();
+        void scrollDown();
 
     private:
         String title = "Ammo";
@@ -101,8 +103,8 @@ class ChronoMenu : public Menu {
 
         void update(screen_data_t data, bool init);
 
-        void btn1();
-        void btn2();
+        void scrollUp();
+        void scrollDown();
 
         bool reload = false;
 
