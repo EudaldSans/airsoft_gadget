@@ -1,4 +1,5 @@
 #include "menus.h"
+#include "config.h"
 
 #include "BlackOpsOne75.h"
 #include "BlackOpsOne28.h"
@@ -17,9 +18,9 @@ void KDRMenu::update(screen_data_t data, bool init) {
     else if (this->deaths == 0) {kdr = this->kills;}
     else {kdr = (float)this->kills/this->deaths;}
 
-    if (kdr >= 1) {color = TFT_GREEN;}
-    else if (kdr >= 0.5) {color = TFT_YELLOW;}
-    else {color = TFT_RED;}
+    if (kdr >= 1) {color = get_word_config(CFG_COLOR_0);}
+    else if (kdr >= 0.5) {color = get_word_config(CFG_COLOR_1);}
+    else {color = get_word_config(CFG_COLOR_2);}
 
     if (kdr > 100 || (kdr == (int)kdr)) {text = String((int)kdr, 10);}
     else if (kdr > 10|| (10 * kdr == (int)(10 * kdr))) {text = String(kdr, 1);}

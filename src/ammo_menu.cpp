@@ -1,4 +1,5 @@
 #include "menus.h"
+#include "config.h"
 
 AmmoMenu::AmmoMenu(TFT_eSPI* p_tft):Menu(p_tft) {
     this->counting_mode = DECREASE_MODE;
@@ -6,7 +7,7 @@ AmmoMenu::AmmoMenu(TFT_eSPI* p_tft):Menu(p_tft) {
 
 void AmmoMenu::update(screen_data_t data, bool init) {
     static float previous_ratio = 1;
-    static uint32_t color = TFT_GREEN;
+    static uint32_t color = get_word_config(CFG_COLOR_0);
     float current_ratio = (float)data.current_ammo / data.total_ammo;
     uint16_t meter_angle =  300 * current_ratio + 30;
     String ammo_text;
@@ -19,9 +20,9 @@ void AmmoMenu::update(screen_data_t data, bool init) {
     }
     
     
-    if (current_ratio > 0.5 && previous_ratio <= 0.5) { color = TFT_GREEN;} 
-    else if (current_ratio > 0.25 && previous_ratio <= 0.5) {color = TFT_YELLOW;} 
-    else if (current_ratio < 0.25 && previous_ratio <= 0.25) {color = TFT_RED;} 
+    if (current_ratio > 0.5 && previous_ratio <= 0.5) { color = get_word_config(CFG_COLOR_0);} 
+    else if (current_ratio > 0.25 && previous_ratio <= 0.5) {color = get_word_config(CFG_COLOR_1);} 
+    else if (current_ratio < 0.25 && previous_ratio <= 0.25) {color = get_word_config(CFG_COLOR_2);} 
     
     Menu::updateArcMeter(ARC_START, meter_angle, color, init);
     Menu::updateCentralText(ammo_text, color, init);

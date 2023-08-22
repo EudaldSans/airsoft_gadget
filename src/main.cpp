@@ -75,8 +75,8 @@ void setup(void) {
 
     tft.begin();
     tft.setRotation(1);
-    tft.fillScreen(DARKER_GREY);
-    tft.drawXBitmap(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_logo_bitmap, RTX_LOGO_W, RTX_LOGO_H, TFT_RED);
+    tft.fillScreen(get_word_config(CFG_COLOR_BG));
+    tft.drawXBitmap(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_logo_bitmap, RTX_LOGO_W, RTX_LOGO_H, get_word_config(CFG_COLOR_2));
 
     Wire.setPins(22, 21);
     // join I2C bus (I2Cdev library doesn't do this automatically)
@@ -89,7 +89,7 @@ void setup(void) {
     // verify connection
     Serial.println("Testing device connections...");
     Serial.println(mag.testConnection() ? "HMC5883L connection successful" : "HMC5883L connection failed");
-    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 50, 70, TFT_RED, TFT_BLACK);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 50, 70, get_word_config(CFG_COLOR_BG), TFT_BLACK);
     
     menus[AMMO_MENU]        = new AmmoMenu(&tft);
     menus[KDR_MENU]         = new KDRMenu(&tft);
@@ -106,7 +106,7 @@ void setup(void) {
 
     delay(1000);
 
-    tft.fillScreen(DARKER_GREY);
+    tft.fillScreen(get_word_config(CFG_COLOR_BG));
 }
 
 

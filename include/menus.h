@@ -11,8 +11,6 @@
 #define ARC_END             330
 #define ARC_THICKNESS       10
 
-#define DARKER_GREY         0x18E3
-
 typedef struct {
     uint16_t total_ammo;
     uint16_t current_ammo;

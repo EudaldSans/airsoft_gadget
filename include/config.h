@@ -13,7 +13,7 @@
 #define COLOR_0_DEFAULT                 TFT_GREEN
 #define COLOR_1_DEFAULT                 TFT_YELLOW
 #define COLOR_2_DEFAULT                 TFT_RED
-#define COLOR_BG_DEFAULT                DARKER_GREY
+#define COLOR_BG_DEFAULT                0x18E3
 
 typedef enum {
     CFG_BOARD_INITIALIZED,
