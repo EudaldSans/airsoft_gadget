@@ -46,7 +46,7 @@ class Menu {
         Menu(TFT_eSPI* p_tft);
         virtual ~Menu(){};
 
-        virtual void update(screen_data_t data, bool init);
+        virtual void update(float heading, bool init);
         virtual void clear();
 
         virtual void btn0();
@@ -80,23 +80,27 @@ class AmmoMenu : public Menu {
     public:
         AmmoMenu(TFT_eSPI* p_tft);
 
-        void update(screen_data_t data, bool init);
+        void update(float heading, bool init);
 
         bool reload = true;
 
         void scrollUp();
         void scrollDown();
+        void shot();
 
     private:
         String title = "Ammo";
         uint8_t counting_mode;
+
+        uint16_t current_ammo;
+        uint16_t total_shots;
 };
 
 class KDRMenu : public Menu {
     public:
         KDRMenu(TFT_eSPI* p_tft);
 
-        void update(screen_data_t data, bool init);
+        void update(float heading, bool init);
 
         void btn0();
         void btn1();
@@ -114,12 +118,13 @@ class ChronoMenu : public Menu {
     public:
         ChronoMenu(TFT_eSPI* p_tft);
 
-        void update(screen_data_t data, bool init);
+        void update(float heading, bool init);
 
         void scrollUp();
         void scrollDown();
 
         bool reload = false;
+        uint16_t speed;
 
     private:
         void drawUnits(uint16_t color, bool init);

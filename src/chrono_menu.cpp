@@ -3,19 +3,22 @@
 
 #include "BlackOpsOne28.h"
 
+#define MAX_SPEED 360
+
 
 ChronoMenu::ChronoMenu(TFT_eSPI* p_tft):Menu(p_tft) {
     this->units = CHRONO_MPS;
     ChronoMenu::_tft = p_tft;
+    this->speed = 0;
 }
 
-void ChronoMenu::update(screen_data_t data, bool init) {
+void ChronoMenu::update(float heading, bool init) {
     static float previous_ratio = 1;
     static uint16_t color = get_word_config(CFG_COLOR_0);
-    float current_ratio = (float) data.speed/data.max_speed;
+    float current_ratio = (float) this->speed/MAX_SPEED;
     String chrono_text;
     int16_t meter_angle =  (float) 2417 * current_ratio - 2145;
-    uint16_t speed = data.speed;
+    uint16_t speed = this->speed;
 
     if      (meter_angle < 30) {meter_angle = 30;}
     else if (meter_angle > ARC_END) {meter_angle = ARC_END;}
@@ -31,7 +34,7 @@ void ChronoMenu::update(screen_data_t data, bool init) {
     
     Menu::updateArcMeter(ARC_START, meter_angle, color, init);
     Menu::updateCentralText(chrono_text, color, init);
-    Menu::updateHeading(data.heading, color, init);  
+    Menu::updateHeading(heading, color, init);  
     Menu::updateMenuTitle(this->title, color, init);
     Menu::display_menu_activity(color, init);
 

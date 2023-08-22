@@ -9,7 +9,7 @@ KDRMenu::KDRMenu(TFT_eSPI* p_tft): Menu(p_tft) {
     this->deaths = 0;
 }
 
-void KDRMenu::update(screen_data_t data, bool init) {
+void KDRMenu::update(float heading, bool init) {
     float kdr;
     uint16_t meter_angle, color;
     String text;
@@ -33,7 +33,7 @@ void KDRMenu::update(screen_data_t data, bool init) {
     meter_angle = 130 * kdr + 50;
 
     Menu::updateArcMeter(meter_angle - 20, meter_angle + 20, color, init);
-    Menu::updateHeading(data.heading, color, init);
+    Menu::updateHeading(heading, color, init);
     Menu::updateMenuTitle(this->title, color, init);
     Menu::display_menu_activity(color, init);
 }

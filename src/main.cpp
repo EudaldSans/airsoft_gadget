@@ -48,16 +48,7 @@ HMC5883L mag;
 
 Menu* menus[NUMBER_OF_MENUS];
 Menu* menu_to_clear = NULL;
-uint8_t current_menu = CHRONO_MENU;
-
-screen_data_t data = {
-    .total_ammo = 30,
-    .current_ammo = 30,
-    .total_shots = 0,
-    .speed = 355,
-    .max_speed = 360,
-    .heading = 0
-};
+uint8_t current_menu;
 
 
 void shot_detected_ISR(void);
@@ -94,6 +85,7 @@ void setup(void) {
     menus[AMMO_MENU]        = new AmmoMenu(&tft);
     menus[KDR_MENU]         = new KDRMenu(&tft);
     menus[CHRONO_MENU]      = new ChronoMenu(&tft);
+    current_menu = get_config(CFG_CURRENT_MENU);
 
     pinMode(ENCODER_KEY, INPUT_PULLUP);
     pinMode(ENCODER_1, INPUT);
@@ -121,13 +113,11 @@ void loop() {
     if(heading < 0) heading += 2 * M_PI;
     heading = heading * 180/M_PI;
 
-    data.heading = heading;
-
     if (menu_to_clear != NULL) {
         menu_to_clear->clear();
         menu_to_clear = NULL;
     }
-    menus[current_menu]->update(data, init_menu);
+    menus[current_menu]->update(heading, init_menu);
     init_menu = false;
 
     if (long_press) {
@@ -140,8 +130,9 @@ void loop() {
 
 
 void IRAM_ATTR shot_detected_ISR(void) {
-    if (data.current_ammo > 0) {data.current_ammo--;}
-    data.total_shots++;
+    AmmoMenu* ammo_menu = static_cast<AmmoMenu*>(menus[AMMO_MENU]);
+
+    if (ammo_menu != NULL) {ammo_menu->shot();}
 }
 
 void IRAM_ATTR btn0_ISR(void) {

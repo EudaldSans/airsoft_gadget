@@ -171,7 +171,7 @@ void Menu::display_menu_activity(uint16_t color, bool init) {
     last_color = color;
 }
 
-void Menu::update(screen_data_t data, bool init) {
+void Menu::update(float heading, bool init) {
     Menu::updateMenuTitle(this->title, get_word_config(CFG_COLOR_2), true);
     Menu::updateCentralText("ERR", get_word_config(CFG_COLOR_2), true);
     Serial.println("Called menu Update!");
