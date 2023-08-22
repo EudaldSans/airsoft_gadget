@@ -3,12 +3,6 @@
 #include "BlackOpsOne28.h"
 
 
-typedef enum {
-    CHRONO_MPS = 0,
-    CHRONO_FPS,
-    NUMBER_OF_UNITS
-} chrono_units_t;
-
 ChronoMenu::ChronoMenu(TFT_eSPI* p_tft):Menu(p_tft) {
     this->units = CHRONO_MPS;
     ChronoMenu::_tft = p_tft;

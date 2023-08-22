@@ -31,6 +31,8 @@
 #include "menus.h"
 #include "RTX_logo.h"
 
+#include "config.h"
+
 #define ENCODER_KEY     15
 #define ENCODER_1       23
 #define ENCODER_2       19      
@@ -40,7 +42,7 @@
 
 TFT_eSPI tft = TFT_eSPI();
 
-bool init_menu = true, inside_menu = false, long_press = true;
+bool init_menu = true, inside_menu = false, long_press = false;
 
 HMC5883L mag;
 
@@ -68,6 +70,8 @@ void encoder_key_event_ISR(void);
 void setup(void) {
     Serial.begin(115200);
     Serial.println("Start");
+
+    init_config();
 
     tft.begin();
     tft.setRotation(1);

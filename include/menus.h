@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Arduino.h"
 
 #include <SPI.h>
@@ -20,13 +22,25 @@ typedef struct {
     float heading;
 } screen_data_t;
 
-
 typedef enum {
     AMMO_MENU = 0,
     KDR_MENU,
     CHRONO_MENU,
     NUMBER_OF_MENUS
 } menu_t;
+
+typedef enum {
+    DECREASE_MODE = 0,
+    INCREASE_MODE,
+    TOTAL_MODE,
+    NUMBER_OF_MODES
+} counting_mode_t;
+
+typedef enum {
+    CHRONO_MPS = 0,
+    CHRONO_FPS,
+    NUMBER_OF_UNITS
+} chrono_units_t;
 
 
 class Menu {

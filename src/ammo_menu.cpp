@@ -1,12 +1,5 @@
 #include "menus.h"
 
-typedef enum {
-    DECREASE_MODE = 0,
-    INCREASE_MODE,
-    TOTAL_MODE,
-    NUMBER_OF_MODES
-} counting_mode_t;
-
 AmmoMenu::AmmoMenu(TFT_eSPI* p_tft):Menu(p_tft) {
     this->counting_mode = DECREASE_MODE;
 }
