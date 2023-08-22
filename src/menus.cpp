@@ -162,6 +162,16 @@ void Menu::updateMenuTitle(String str, uint16_t color, bool init) {
     previous_str = str;
 }
 
+void Menu::display_menu_activity(uint16_t color, bool init) {
+    static uint16_t last_color = TFT_GREEN;
+    if ((last_color == color && this->menu_active) || init);
+
+    if (this->menu_active) {this->_tft->fillCircle(SCREEN_CENTER, 30, 10, color);}
+    else {this->_tft->fillCircle(SCREEN_CENTER, 30, 10, DARKER_GREY);}
+
+    last_color = color;
+}
+
 void Menu::update(screen_data_t data, bool init) {
     Menu::updateMenuTitle(this->title, TFT_RED, true);
     Menu::updateCentralText("ERR", TFT_RED, true);

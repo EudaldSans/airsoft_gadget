@@ -34,6 +34,7 @@ void KDRMenu::update(screen_data_t data, bool init) {
     Menu::updateArcMeter(meter_angle - 20, meter_angle + 20, color, init);
     Menu::updateHeading(data.heading, color, init);
     Menu::updateMenuTitle(this->title, color, init);
+    Menu::display_menu_activity(color, init);
 }
 
 void KDRMenu::btn0() {

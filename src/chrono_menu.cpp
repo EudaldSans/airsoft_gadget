@@ -38,6 +38,7 @@ void ChronoMenu::update(screen_data_t data, bool init) {
     Menu::updateCentralText(chrono_text, color, init);
     Menu::updateHeading(data.heading, color, init);  
     Menu::updateMenuTitle(this->title, color, init);
+    Menu::display_menu_activity(color, init);
 
     Menu::_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 247, 248, TFT_RED, TFT_BLACK);
 

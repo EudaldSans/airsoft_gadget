@@ -140,19 +140,12 @@ void loop() {
 
     data.heading = heading;
 
-    // dec_ammo_menu->update(data, false);
     if (menu_to_clear != NULL) {
         menu_to_clear->clear();
         menu_to_clear = NULL;
     }
     menus[current_menu]->update(data, init_menu);
     init_menu = false;
-
-    // if (pressed) {
-    //     Serial.print("Encoder press @: ");
-    //     Serial.println(last_encoder_press);
-    //     pressed = false;
-    // }
 
     if (long_press) {
         Serial.println("Encoder long press");

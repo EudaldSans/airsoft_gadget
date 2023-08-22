@@ -54,6 +54,7 @@ class Menu {
         void updateKDR(float kdr, uint16_t color, bool init);
         void updateCentralText(String str, uint16_t color, bool init);
         void updateMenuTitle(String str, uint16_t color, bool init);
+        void display_menu_activity(uint16_t color, bool init);
 
         TFT_eSPI* _tft;
         uint16_t small_font_height, large_font_height;

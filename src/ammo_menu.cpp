@@ -34,6 +34,7 @@ void AmmoMenu::update(screen_data_t data, bool init) {
     Menu::updateCentralText(ammo_text, color, init);
     Menu::updateHeading(data.heading, color, init);  
     Menu::updateMenuTitle(this->title, color, init);
+    Menu::display_menu_activity(color, init);
 
     previous_ratio = current_ratio;
 }
