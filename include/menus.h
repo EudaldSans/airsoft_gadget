@@ -90,7 +90,7 @@ class AmmoMenu : public Menu {
 
     private:
         String title = "Ammo";
-        uint8_t counting_mode;
+        int8_t counting_mode;
 
         uint16_t current_ammo;
         uint16_t total_shots;
@@ -130,6 +130,6 @@ class ChronoMenu : public Menu {
         void drawUnits(uint16_t color, bool init);
         void clear();
         
-        uint16_t units;
+        int8_t units;
         String title = "Chrono";
 };

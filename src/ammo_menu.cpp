@@ -43,7 +43,7 @@ void AmmoMenu::scrollUp() {
 
 void AmmoMenu::scrollDown() {
     this->counting_mode--;
-    if (this->counting_mode <= 0) {this->counting_mode = NUMBER_OF_MODES - 1;}
+    if (this->counting_mode < 0) {this->counting_mode = NUMBER_OF_MODES - 1;}
 }
 
 void AmmoMenu::shot() {

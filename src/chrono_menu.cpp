@@ -7,7 +7,6 @@
 
 
 ChronoMenu::ChronoMenu(TFT_eSPI* p_tft):Menu(p_tft) {
-    this->units = CHRONO_MPS;
     ChronoMenu::_tft = p_tft;
     this->speed = 0;
 }
@@ -48,6 +47,7 @@ void ChronoMenu::update(float heading, bool init) {
 void ChronoMenu::drawUnits(uint16_t color, bool init) {
     static uint16_t previous_color = get_word_config(CFG_COLOR_0);
     static chrono_units_t previous_unit = CHRONO_FPS;
+    this->units = get_config(CFG_CHRONO_UNIT);
 
     if (previous_color == color && previous_unit == this->units && init == false) {return;}
 
@@ -74,11 +74,15 @@ void ChronoMenu::drawUnits(uint16_t color, bool init) {
 void ChronoMenu::scrollUp() {
     this->units++;
     if (this->units >= NUMBER_OF_UNITS) {this->units = 0;}
+    update_config(CFG_CHRONO_UNIT, this->units);
+    Serial.println("Updated the units");
 }
 
 void ChronoMenu::scrollDown() {
     this->units--;
-    if (this->units <= 0) {this->units = NUMBER_OF_UNITS - 1;}
+    if (this->units < 0) {this->units = NUMBER_OF_UNITS - 1;}
+    update_config(CFG_CHRONO_UNIT, this->units);
+    Serial.println("Updated the units");
 }
 
 void ChronoMenu::clear() {

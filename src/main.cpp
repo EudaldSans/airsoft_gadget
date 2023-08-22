@@ -39,6 +39,8 @@
 
 #define LONG_PRESS_TIME_MS      3000
 
+#define FLASH_UPDATE_PERIOD_MS  500
+
 
 TFT_eSPI tft = TFT_eSPI();
 
@@ -104,6 +106,8 @@ void setup(void) {
 
 void loop() {
     int16_t mx, my, mz;
+    static unsigned long last_flash_update = 0;
+    unsigned long now = millis();
     
     // read raw heading measurements from device
     mag.getHeading(&mx, &my, &mz);
@@ -117,6 +121,11 @@ void loop() {
         menu_to_clear->clear();
         menu_to_clear = NULL;
     }
+
+    if (init_menu) {
+        update_config(CFG_CURRENT_MENU, current_menu);
+    }
+
     menus[current_menu]->update(heading, init_menu);
     init_menu = false;
 
@@ -125,13 +134,18 @@ void loop() {
         long_press = false;
     }
 
+    if ((now - last_flash_update) > FLASH_UPDATE_PERIOD_MS) {
+       save_all_configs();
+       last_flash_update = now; 
+       Serial.println("Updated all flash values");
+    }
+
     delay(100);
 }
 
 
 void IRAM_ATTR shot_detected_ISR(void) {
     AmmoMenu* ammo_menu = static_cast<AmmoMenu*>(menus[AMMO_MENU]);
-
     if (ammo_menu != NULL) {ammo_menu->shot();}
 }
 
@@ -161,7 +175,7 @@ void IRAM_ATTR encoder_1_ISR(void) {
         }
     } else { // turning counter clock wise
         if (inside_menu) {
-            menus[current_menu]->scrollUp();
+            menus[current_menu]->scrollDown();
         } else {
             if (menu_to_clear == NULL) {menu_to_clear = menus[current_menu];}
             current_menu--;
