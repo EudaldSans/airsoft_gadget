@@ -45,6 +45,7 @@ bool init_menu = true, inside_menu = false, long_press = true;
 HMC5883L mag;
 
 Menu* menus[NUMBER_OF_MENUS];
+Menu* menu_to_clear = NULL;
 uint8_t current_menu = CHRONO_MENU;
 
 screen_data_t data = {
@@ -129,7 +130,6 @@ void setup(void) {
 void loop() {
     int16_t mx, my, mz;
     
-    
     // read raw heading measurements from device
     mag.getHeading(&mx, &my, &mz);
     
@@ -141,6 +141,10 @@ void loop() {
     data.heading = heading;
 
     // dec_ammo_menu->update(data, false);
+    if (menu_to_clear != NULL) {
+        menu_to_clear->clear();
+        menu_to_clear = NULL;
+    }
     menus[current_menu]->update(data, init_menu);
     init_menu = false;
 
@@ -187,6 +191,7 @@ void IRAM_ATTR encoder_1_ISR(void) {
         if (inside_menu) {
             menus[current_menu]->scrollUp();
         } else {
+            if (menu_to_clear == NULL) {menu_to_clear = menus[current_menu];}
             current_menu++;
             if (current_menu >= NUMBER_OF_MENUS) {current_menu = 0;}
             init_menu = true;
@@ -195,6 +200,7 @@ void IRAM_ATTR encoder_1_ISR(void) {
         if (inside_menu) {
             menus[current_menu]->scrollUp();
         } else {
+            if (menu_to_clear == NULL) {menu_to_clear = menus[current_menu];}
             current_menu--;
             if (current_menu >= NUMBER_OF_MENUS) {current_menu = NUMBER_OF_MENUS - 1;}
             init_menu = true;
