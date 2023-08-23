@@ -29,9 +29,11 @@
 #include "TFT_eSPI.h"
 
 #include "menus.h"
-#include "RTX_logo.h"
+#include "EG_logo.h"
 
 #include "config.h"
+
+#include <driver/rtc_io.h>
 
 #define ENCODER_KEY     15
 #define ENCODER_1       23
@@ -98,6 +100,9 @@ void setup(void) {
     attachInterrupt(ENCODER_KEY, encoder_key_event_ISR, CHANGE);
     attachInterrupt(ENCODER_1, encoder_1_ISR, FALLING);
 
+    rtc_gpio_pullup_en(GPIO_NUM_15);
+    esp_sleep_enable_ext0_wakeup(GPIO_NUM_15, 0);
+
     delay(1000);
 
     tft.fillScreen(get_word_config(CFG_COLOR_BG));
@@ -132,6 +137,10 @@ void loop() {
     if (long_press) {
         Serial.println("Encoder long press");
         long_press = false;
+        rtc_gpio_set_direction(GPIO_NUM_4, RTC_GPIO_MODE_OUTPUT_ONLY);
+        rtc_gpio_set_level(GPIO_NUM_4, 1);
+        delay(100);
+        esp_deep_sleep_start();
     }
 
     if ((now - last_flash_update) > FLASH_UPDATE_PERIOD_MS) {

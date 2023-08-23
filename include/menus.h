@@ -88,12 +88,16 @@ class AmmoMenu : public Menu {
         void scrollDown();
         void shot();
 
+        void clear();
+
     private:
         String title = "Ammo";
         int8_t counting_mode;
 
         uint16_t current_ammo;
         uint16_t total_shots;
+
+        void drawCountingMode(uint16_t color, bool init);
 };
 
 class KDRMenu : public Menu {

@@ -75,14 +75,12 @@ void ChronoMenu::scrollUp() {
     this->units++;
     if (this->units >= NUMBER_OF_UNITS) {this->units = 0;}
     update_config(CFG_CHRONO_UNIT, this->units);
-    Serial.println("Updated the units");
 }
 
 void ChronoMenu::scrollDown() {
     this->units--;
     if (this->units < 0) {this->units = NUMBER_OF_UNITS - 1;}
     update_config(CFG_CHRONO_UNIT, this->units);
-    Serial.println("Updated the units");
 }
 
 void ChronoMenu::clear() {

@@ -1,8 +1,9 @@
 #include "menus.h"
 #include "config.h"
+#include "arrows.h"
 
 AmmoMenu::AmmoMenu(TFT_eSPI* p_tft):Menu(p_tft) {
-    this->counting_mode = DECREASE_MODE;
+    this->counting_mode = get_config(CFG_AMMO_COUNT_SETTING);
     this->current_ammo = get_word_config(CFG_AMMO_MAG_SIZE);
     this->total_shots = 0;
 }
@@ -32,18 +33,43 @@ void AmmoMenu::update(float heading, bool init) {
     Menu::updateHeading(heading, color, init);  
     Menu::updateMenuTitle(this->title, color, init);
     Menu::display_menu_activity(color, init);
+    this->drawCountingMode(color, init);
 
     previous_ratio = current_ratio;
+}
+
+void AmmoMenu::drawCountingMode(uint16_t color, bool init) {
+    static int8_t previous_counting_mode = 0;
+    if ((previous_counting_mode == this->counting_mode) && !init) {return;}
+
+    Serial.println("Updating mode sprite");
+
+    Menu::_tft->fillRect(SCREEN_CENTER + 55, SCREEN_CENTER - 57, ARROW_WIDTH, ARROW_HEIGHT, get_word_config(CFG_COLOR_BG));
+
+    switch (this->counting_mode) {
+        case DECREASE_MODE: Menu::_tft->drawXBitmap(SCREEN_CENTER + 55, SCREEN_CENTER - 57, arrowDown, ARROW_WIDTH, ARROW_HEIGHT, color);       break;
+        case INCREASE_MODE: Menu::_tft->drawXBitmap(SCREEN_CENTER + 55, SCREEN_CENTER - 57, arrowUp, ARROW_WIDTH, ARROW_HEIGHT, color);         break;
+        case TOTAL_MODE:    Menu::_tft->drawXBitmap(SCREEN_CENTER + 55, SCREEN_CENTER - 57, doubleArrow, ARROW_WIDTH, ARROW_HEIGHT, color);     break;
+        default:            Serial.println("ERROR, tried to paint invalid ammo counting mode");                                                 break;
+    }    
+
+    previous_counting_mode = this->counting_mode;
+}
+
+void AmmoMenu::clear() {
+    Menu::_tft->fillRect(SCREEN_CENTER + 55, SCREEN_CENTER - 57, ARROW_WIDTH, ARROW_HEIGHT, get_word_config(CFG_COLOR_BG));
 }
 
 void AmmoMenu::scrollUp() {
     this->counting_mode++;
     if (this->counting_mode >= NUMBER_OF_MODES) {this->counting_mode = 0;}
+    update_config(CFG_AMMO_COUNT_SETTING, this->counting_mode);
 }
 
 void AmmoMenu::scrollDown() {
     this->counting_mode--;
     if (this->counting_mode < 0) {this->counting_mode = NUMBER_OF_MODES - 1;}
+    update_config(CFG_AMMO_COUNT_SETTING, this->counting_mode);
 }
 
 void AmmoMenu::shot() {
