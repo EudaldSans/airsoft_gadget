@@ -69,7 +69,7 @@ void setup(void) {
     init_config();
 
     tft.begin();
-    tft.setRotation(1);
+    tft.setRotation(3);
     tft.fillScreen(get_word_config(CFG_COLOR_BG));
     tft.drawXBitmap(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_logo_bitmap, RTX_LOGO_W, RTX_LOGO_H, get_word_config(CFG_COLOR_2));
 

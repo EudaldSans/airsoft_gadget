@@ -4,8 +4,6 @@
 #include "BlackOpsOne75.h"
 #include "BlackOpsOne28.h"
 
-#include "logo.h"
-
 #include <iomanip>
 #include <sstream>
 
