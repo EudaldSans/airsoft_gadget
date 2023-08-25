@@ -84,7 +84,7 @@ void setup(void) {
     // verify connection
     Serial.println("Testing device connections...");
     Serial.println(mag.testConnection() ? "HMC5883L connection successful" : "HMC5883L connection failed");
-    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 50, 70, get_word_config(CFG_COLOR_BG), TFT_BLACK);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - METER_THICKNESS, 50, 70, get_word_config(CFG_COLOR_BG), TFT_BLACK);
     
     menus[AMMO_MENU]        = new AmmoMenu(&tft);
     menus[KDR_MENU]         = new KDRMenu(&tft);

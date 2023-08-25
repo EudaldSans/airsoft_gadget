@@ -16,11 +16,11 @@ void ChronoMenu::update(float heading, bool init) {
     static uint16_t color = get_word_config(CFG_COLOR_0);
     float current_ratio = (float) this->speed/MAX_SPEED;
     String chrono_text;
-    int16_t meter_angle =  (float) 2417 * current_ratio - 2145;
+    int16_t meter_width =  (float) 785 * current_ratio - 628;
     uint16_t speed = this->speed;
 
-    if      (meter_angle < 30) {meter_angle = 30;}
-    else if (meter_angle > ARC_END) {meter_angle = ARC_END;}
+    if      (meter_width < 0) {meter_width = 0;}
+    else if (meter_width > METER_WIDTH) {meter_width = METER_WIDTH;}
 
     if      (this->units == CHRONO_FPS) {speed = speed * 3.28084;}
 
@@ -31,14 +31,13 @@ void ChronoMenu::update(float heading, bool init) {
     else if (current_ratio >= 0.95 && current_ratio <= 1) {color = get_word_config(CFG_COLOR_1);} 
     else    {color = get_word_config(CFG_COLOR_2);} 
     
-    Menu::updateArcMeter(ARC_START, meter_angle, color, init);
+    Menu::updateMeter(METER_START, meter_width, color, init);
     Menu::updateCentralText(chrono_text, color, init);
     Menu::updateHeading(heading, color, init);  
     Menu::updateMenuTitle(this->title, color, init);
     Menu::display_menu_activity(color, init);
 
-    Menu::_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, 245, 249, get_word_config(CFG_COLOR_2), TFT_BLACK);
-
+    Menu::_tft->fillRect(156, SCREEN_CENTER + this->large_font_height/2, 3, METER_THICKNESS, get_word_config(CFG_COLOR_2));
     ChronoMenu::drawUnits(color, init);
 
     previous_ratio = current_ratio;

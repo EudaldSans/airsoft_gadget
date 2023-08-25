@@ -13,7 +13,7 @@ void AmmoMenu::update(float heading, bool init) {
     static uint32_t color = get_word_config(CFG_COLOR_0);
     uint16_t total_ammo = get_word_config(CFG_AMMO_MAG_SIZE);
     float current_ratio = (float)this->current_ammo / total_ammo;
-    uint16_t meter_angle =  300 * current_ratio + 30;
+    uint16_t meter_width =  METER_WIDTH * current_ratio;
     String ammo_text;
 
     switch (this->counting_mode) {
@@ -28,7 +28,7 @@ void AmmoMenu::update(float heading, bool init) {
     else if (current_ratio > 0.25 && previous_ratio <= 0.5) {color = get_word_config(CFG_COLOR_1);} 
     else if (current_ratio < 0.25 && previous_ratio <= 0.25) {color = get_word_config(CFG_COLOR_2);} 
     
-    Menu::updateArcMeter(ARC_START, meter_angle, color, init);
+    Menu::updateMeter(METER_START, meter_width, color, init);
     Menu::updateCentralText(ammo_text, color, init);
     Menu::updateHeading(heading, color, init);  
     Menu::updateMenuTitle(this->title, color, init);

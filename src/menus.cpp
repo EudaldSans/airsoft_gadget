@@ -15,7 +15,7 @@
 #define ARC_RADIOUS     120
 #define ARC_START       30
 #define ARC_END         330
-#define ARC_THICKNESS   10
+#define METER_THICKNESS   10
 
 Menu::Menu(TFT_eSPI* p_tft) {
     this->_tft = p_tft;
@@ -29,48 +29,40 @@ Menu::Menu(TFT_eSPI* p_tft) {
     this->_tft->unloadFont(); 
 }
 
-void Menu::updateArcMeter(uint16_t new_start_angle, uint16_t new_end_angle, uint16_t color, bool init) {
-    static uint16_t last_end_angle = 30, last_start_angle = 330;
-    static uint16_t meter_last_color = get_word_config(CFG_COLOR_0);
+void Menu::updateMeter(uint16_t new_start_pos, uint16_t new_width, uint16_t color, bool init) {
+    static uint16_t last_start_pos = 5, last_end_pos = METER_WIDTH + 5;
+    static uint16_t last_color = get_word_config(CFG_COLOR_0);
 
-    if (init) {
-        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
-        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, ARC_START, new_start_angle, TFT_BLACK, get_word_config(CFG_COLOR_BG)); 
-        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_end_angle, ARC_END, TFT_BLACK, get_word_config(CFG_COLOR_BG));
+    uint16_t new_end_pos = new_start_pos + new_width;
+    uint16_t meter_y = SCREEN_CENTER + this->large_font_height/2;
+
+    if (init || (color != last_color)) {
+        this->_tft->fillRect(new_start_pos, meter_y, new_width, METER_THICKNESS, color);
+        this->_tft->fillRect(METER_START, meter_y, new_start_pos - METER_START, METER_THICKNESS, TFT_BLACK);
+        this->_tft->fillRect(new_end_pos, meter_y, METER_WIDTH - (new_end_pos - METER_START), METER_THICKNESS, TFT_BLACK);
         goto cleanup;
     }
 
-    if (new_end_angle <= last_start_angle || new_start_angle >= last_end_angle) {
-        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_start_angle, last_end_angle, TFT_BLACK, get_word_config(CFG_COLOR_BG));
-        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
-        goto cleanup;
-    }
-
-    if (new_end_angle < last_end_angle) {
-        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_end_angle, last_end_angle, TFT_BLACK, get_word_config(CFG_COLOR_BG));
-    }
-
-    if (new_start_angle > last_start_angle) {
-        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_start_angle, new_start_angle, TFT_BLACK, get_word_config(CFG_COLOR_BG));
-    }
-
-    if (meter_last_color != color) {
-        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, new_end_angle, color, TFT_BLACK);
-        goto cleanup;
-    } 
-    
-    if (new_end_angle > last_end_angle) {
-        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, last_end_angle, new_end_angle, color, TFT_BLACK);
+    if (new_start_pos < last_start_pos) {
+        this->_tft->fillRect(new_start_pos, meter_y, last_start_pos - new_start_pos, METER_THICKNESS, color);
     } 
 
-    if (new_start_angle < last_start_angle) {
-        this->_tft->drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - ARC_THICKNESS, new_start_angle, last_start_angle, color, TFT_BLACK);
-    } 
+    if (new_end_pos > last_end_pos) {
+        this->_tft->fillRect(last_end_pos, meter_y,  new_end_pos - last_end_pos, METER_THICKNESS, color);
+    }
+
+    if (new_start_pos > last_start_pos) {
+        this->_tft->fillRect(last_start_pos, meter_y, new_start_pos - last_start_pos, METER_THICKNESS, get_word_config(CFG_COLOR_BG));
+    }
+
+    if (new_end_pos < last_end_pos) {
+        this->_tft->fillRect(new_end_pos, meter_y, last_end_pos - new_end_pos, METER_THICKNESS, get_word_config(CFG_COLOR_BG));
+    }
 
 cleanup:
-    last_end_angle = new_end_angle;
-    last_start_angle = new_start_angle;
-    meter_last_color = color;
+    last_end_pos = new_end_pos;
+    last_start_pos = new_start_pos;
+    last_color = color;
 }
 
 void Menu::updateHeading(float heading, uint16_t color, bool init) {

@@ -9,7 +9,10 @@
 #define ARC_RADIOUS         120
 #define ARC_START           30
 #define ARC_END             330
-#define ARC_THICKNESS       10
+
+#define METER_THICKNESS       10
+#define METER_WIDTH         230
+#define METER_START         5
 
 typedef struct {
     uint16_t total_ammo;
@@ -61,7 +64,7 @@ class Menu {
     
     protected:
         void updateHeading(float, uint16_t color, bool init);
-        void updateArcMeter(uint16_t new_start_angle, uint16_t new_end_angle, uint16_t color, bool init);
+        void updateMeter(uint16_t new_start_angle, uint16_t new_end_angle, uint16_t color, bool init);
         void updateAmoCounter(uint16_t ammo, uint16_t color, bool init);
         void updateKDR(float kdr, uint16_t color, bool init);
         void updateCentralText(String str, uint16_t color, bool init);

@@ -11,7 +11,7 @@ KDRMenu::KDRMenu(TFT_eSPI* p_tft): Menu(p_tft) {
 
 void KDRMenu::update(float heading, bool init) {
     float kdr;
-    uint16_t meter_angle, color;
+    uint16_t meter_centre, color;
     String text;
 
     if (this->deaths == 0 && this-> kills == 0) {kdr = 1;}
@@ -30,9 +30,9 @@ void KDRMenu::update(float heading, bool init) {
 
     if (kdr > 2) {kdr = 2;}
 
-    meter_angle = 130 * kdr + 50;
+    meter_centre = 95 * kdr + 20 + METER_START;
 
-    Menu::updateArcMeter(meter_angle - 20, meter_angle + 20, color, init);
+    Menu::updateMeter(meter_centre - 20, 40, color, init);
     Menu::updateHeading(heading, color, init);
     Menu::updateMenuTitle(this->title, color, init);
     Menu::display_menu_activity(color, init);
