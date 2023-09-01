@@ -95,6 +95,7 @@ void setup(void) {
     menus[AMMO_MENU]        = new AmmoMenu(&tft);
     menus[KDR_MENU]         = new KDRMenu(&tft);
     menus[CHRONO_MENU]      = new ChronoMenu(&tft);
+    menus[SETTINGS_MENU]    = new SettingsMenu(&tft);
     current_menu = get_config(CFG_CURRENT_MENU);
 
     pinMode(ENCODER_KEY, INPUT_PULLUP);

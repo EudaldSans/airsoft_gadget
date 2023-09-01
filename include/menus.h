@@ -33,6 +33,7 @@ typedef enum {
     AMMO_MENU = 0,
     KDR_MENU,
     CHRONO_MENU,
+    SETTINGS_MENU,
     NUMBER_OF_MENUS
 } menu_t;
 
@@ -65,8 +66,6 @@ class Menu {
         virtual void scrollUp();
         virtual void scrollDown();
         virtual bool scrollKey();
-
-        bool reload = false;
     
     protected:
         void updateHeading(float, uint16_t color, bool init);
@@ -90,8 +89,6 @@ class AmmoMenu : public Menu {
         AmmoMenu(TFT_eSPI* p_tft);
 
         void update(float heading, bool init);
-
-        bool reload = true;
 
         void scrollUp();
         void scrollDown();
@@ -119,7 +116,6 @@ class KDRMenu : public Menu {
         void btn1();
         void btn2();
 
-        bool reload = false;
 
     private:
         uint16_t kills;
@@ -136,13 +132,37 @@ class ChronoMenu : public Menu {
         void scrollUp();
         void scrollDown();
 
-        bool reload = false;
+        void clear();
+
         uint16_t speed;
 
     private:
         void drawUnits(uint16_t color, bool init);
-        void clear();
         
         int8_t units;
         String title = "Chrono";
+};
+
+class SettingsMenu : public Menu {
+    public: 
+        SettingsMenu(TFT_eSPI* p_tft);
+
+        void update(float heading, bool init);
+
+        void scrollUp();
+        void scrollDown();
+        bool scrollKey();
+
+        void clear();
+
+    private:
+        void drawSliderSetting(uint16_t min, uint16_t max, uint16_t pos);
+        void drawColorSetting(uint32_t current_color);
+        void drawStringSetting(bool draw_left, bool draw_right, String current_text);
+        void drawYesNoSetting(bool current_setting);
+
+        void drawMainMenu(bool init);
+
+        int8_t current_setting = 0, previous_setting = 0xff;
+        
 };
