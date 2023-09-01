@@ -37,7 +37,7 @@ void ChronoMenu::update(float heading, bool init) {
     Menu::updateMenuTitle(this->title, color, init);
     Menu::display_menu_activity(color, init);
 
-    Menu::_tft->fillRect(156, SCREEN_CENTER + this->large_font_height/2, 3, METER_THICKNESS, get_word_config(CFG_COLOR_2));
+    Menu::_tft->fillRect(156, METER_Y, 4, METER_THICKNESS, get_word_config(CFG_COLOR_2));
     ChronoMenu::drawUnits(color, init);
 
     previous_ratio = current_ratio;
@@ -53,16 +53,16 @@ void ChronoMenu::drawUnits(uint16_t color, bool init) {
     Menu::_tft->loadFont(BlackOpsOne28);
     
     Menu::_tft->setCursor(SCREEN_CENTER, SCREEN_CENTER);
-    Menu::_tft->setTextDatum(TL_DATUM);
+    Menu::_tft->setTextDatum(TR_DATUM);
     Menu::_tft->setTextColor(get_word_config(CFG_COLOR_BG));
    
-    if (previous_unit == CHRONO_MPS) {Menu::_tft->drawString("m/s", SCREEN_CENTER, SCREEN_CENTER + this->large_font_height / 2);}
-    else if (previous_unit == CHRONO_FPS) {Menu::_tft->drawString("fps", SCREEN_CENTER, SCREEN_CENTER + this->large_font_height / 2);}
+    if (previous_unit == CHRONO_MPS) {Menu::_tft->drawString("m/s", SCREEN_WIDTH, this->large_font_height + METER_Y + METER_THICKNESS + MENU_SPACING);}
+    else if (previous_unit == CHRONO_FPS) {Menu::_tft->drawString("fps", SCREEN_WIDTH, this->large_font_height + METER_Y + METER_THICKNESS + MENU_SPACING);}
    
     Menu::_tft->setTextColor(color);
    
-    if (this->units == CHRONO_MPS) {Menu::_tft->drawString("m/s", SCREEN_CENTER, SCREEN_CENTER + this->large_font_height / 2);}
-    else if (this->units == CHRONO_FPS) {Menu::_tft->drawString("fps", SCREEN_CENTER, SCREEN_CENTER + this->large_font_height / 2);}
+    if (this->units == CHRONO_MPS) {Menu::_tft->drawString("m/s", SCREEN_WIDTH, this->large_font_height + METER_Y + METER_THICKNESS + MENU_SPACING);}
+    else if (this->units == CHRONO_FPS) {Menu::_tft->drawString("fps", SCREEN_WIDTH, this->large_font_height + METER_Y + METER_THICKNESS + MENU_SPACING);}
 
     Menu::_tft->unloadFont();
     
@@ -85,11 +85,11 @@ void ChronoMenu::scrollDown() {
 void ChronoMenu::clear() {
     Menu::_tft->loadFont(BlackOpsOne28);
     Menu::_tft->setCursor(SCREEN_CENTER, SCREEN_CENTER);
-    Menu::_tft->setTextDatum(TL_DATUM);
+    Menu::_tft->setTextDatum(TR_DATUM);
     Menu::_tft->setTextColor(get_word_config(CFG_COLOR_BG));
    
-    if (this->units == CHRONO_MPS) {Menu::_tft->drawString("m/s", SCREEN_CENTER, SCREEN_CENTER + this->large_font_height / 2);}
-    else if (this->units == CHRONO_FPS) {Menu::_tft->drawString("fps", SCREEN_CENTER, SCREEN_CENTER + this->large_font_height / 2);}
+    if (this->units == CHRONO_MPS) {Menu::_tft->drawString("m/s", SCREEN_WIDTH, this->large_font_height + METER_Y + METER_THICKNESS + MENU_SPACING);}
+    else if (this->units == CHRONO_FPS) {Menu::_tft->drawString("fps", SCREEN_WIDTH, this->large_font_height + METER_Y + METER_THICKNESS + MENU_SPACING);}
    
     Menu::_tft->unloadFont();
 }

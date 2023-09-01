@@ -35,9 +35,9 @@
 
 #include <driver/rtc_io.h>
 
-#define ENCODER_KEY     15
-#define ENCODER_1       23
-#define ENCODER_2       19      
+#define ENCODER_KEY     GPIO_NUM_15
+#define ENCODER_1       GPIO_NUM_23
+#define ENCODER_2       GPIO_NUM_19      
 
 #define LONG_PRESS_TIME_MS      3000
 
@@ -63,15 +63,22 @@ void encoder_2_ISR(void);
 void encoder_key_event_ISR(void);
 
 void setup(void) {
+    uint32_t splash_screen_color;
     Serial.begin(115200);
     Serial.println("Start");
 
+    pinMode(4, OUTPUT);
+    digitalWrite(4, HIGH);
+    delay(25);
+
     init_config();
+    splash_screen_color = get_word_config(CFG_COLOR_2);
 
     tft.begin();
     tft.setRotation(3);
     tft.fillScreen(get_word_config(CFG_COLOR_BG));
-    tft.drawXBitmap(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_logo_bitmap, RTX_LOGO_W, RTX_LOGO_H, get_word_config(CFG_COLOR_2));
+    tft.drawXBitmap(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_logo_bitmap, RTX_LOGO_W, RTX_LOGO_H, splash_screen_color);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 30, 50, splash_screen_color, TFT_BLACK);
 
     Wire.setPins(22, 21);
     // join I2C bus (I2Cdev library doesn't do this automatically)
@@ -84,7 +91,6 @@ void setup(void) {
     // verify connection
     Serial.println("Testing device connections...");
     Serial.println(mag.testConnection() ? "HMC5883L connection successful" : "HMC5883L connection failed");
-    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - METER_THICKNESS, 50, 70, get_word_config(CFG_COLOR_BG), TFT_BLACK);
     
     menus[AMMO_MENU]        = new AmmoMenu(&tft);
     menus[KDR_MENU]         = new KDRMenu(&tft);
@@ -99,11 +105,21 @@ void setup(void) {
     attachInterrupt(0, btn0_ISR, FALLING);
     attachInterrupt(ENCODER_KEY, encoder_key_event_ISR, CHANGE);
     attachInterrupt(ENCODER_1, encoder_1_ISR, FALLING);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 50, 70, splash_screen_color, TFT_BLACK);
 
-    rtc_gpio_pullup_en(GPIO_NUM_15);
-    esp_sleep_enable_ext0_wakeup(GPIO_NUM_15, 0);
-
-    delay(1000);
+    delay(100);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 70, 90, splash_screen_color, TFT_BLACK);
+    delay(150);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 90, 100, splash_screen_color, TFT_BLACK);
+    delay(50);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 100, 150, splash_screen_color, TFT_BLACK);
+    delay(250);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 150, 175, splash_screen_color, TFT_BLACK);
+    delay(100);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 175, 225, splash_screen_color, TFT_BLACK);
+    delay(300);
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 225, ARC_END, splash_screen_color, TFT_BLACK);
+    
 
     tft.fillScreen(get_word_config(CFG_COLOR_BG));
 }
@@ -137,8 +153,13 @@ void loop() {
     if (long_press) {
         Serial.println("Encoder long press");
         long_press = false;
+        tft.fillScreen(TFT_BLACK);
         rtc_gpio_set_direction(GPIO_NUM_4, RTC_GPIO_MODE_OUTPUT_ONLY);
-        rtc_gpio_set_level(GPIO_NUM_4, 1);
+        rtc_gpio_set_level(GPIO_NUM_4, 0);
+
+        rtc_gpio_pullup_en(ENCODER_KEY);
+        esp_sleep_enable_ext0_wakeup(ENCODER_KEY, 0);
+
         delay(100);
         esp_deep_sleep_start();
     }

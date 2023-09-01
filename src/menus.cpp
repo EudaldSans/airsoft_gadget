@@ -15,7 +15,6 @@
 #define ARC_RADIOUS     120
 #define ARC_START       30
 #define ARC_END         330
-#define METER_THICKNESS   10
 
 Menu::Menu(TFT_eSPI* p_tft) {
     this->_tft = p_tft;
@@ -34,29 +33,28 @@ void Menu::updateMeter(uint16_t new_start_pos, uint16_t new_width, uint16_t colo
     static uint16_t last_color = get_word_config(CFG_COLOR_0);
 
     uint16_t new_end_pos = new_start_pos + new_width;
-    uint16_t meter_y = SCREEN_CENTER + this->large_font_height/2;
 
     if (init || (color != last_color)) {
-        this->_tft->fillRect(new_start_pos, meter_y, new_width, METER_THICKNESS, color);
-        this->_tft->fillRect(METER_START, meter_y, new_start_pos - METER_START, METER_THICKNESS, TFT_BLACK);
-        this->_tft->fillRect(new_end_pos, meter_y, METER_WIDTH - (new_end_pos - METER_START), METER_THICKNESS, TFT_BLACK);
+        this->_tft->fillRect(new_start_pos, METER_Y, new_width, METER_THICKNESS, color);
+        this->_tft->fillRect(METER_START, METER_Y, new_start_pos - METER_START, METER_THICKNESS, TFT_BLACK);
+        this->_tft->fillRect(new_end_pos, METER_Y, METER_WIDTH - (new_end_pos - METER_START), METER_THICKNESS, TFT_BLACK);
         goto cleanup;
     }
 
     if (new_start_pos < last_start_pos) {
-        this->_tft->fillRect(new_start_pos, meter_y, last_start_pos - new_start_pos, METER_THICKNESS, color);
+        this->_tft->fillRect(new_start_pos, METER_Y, last_start_pos - new_start_pos, METER_THICKNESS, color);
     } 
 
     if (new_end_pos > last_end_pos) {
-        this->_tft->fillRect(last_end_pos, meter_y,  new_end_pos - last_end_pos, METER_THICKNESS, color);
+        this->_tft->fillRect(last_end_pos, METER_Y,  new_end_pos - last_end_pos, METER_THICKNESS, color);
     }
 
     if (new_start_pos > last_start_pos) {
-        this->_tft->fillRect(last_start_pos, meter_y, new_start_pos - last_start_pos, METER_THICKNESS, get_word_config(CFG_COLOR_BG));
+        this->_tft->fillRect(last_start_pos, METER_Y, new_start_pos - last_start_pos, METER_THICKNESS, get_word_config(CFG_COLOR_BG));
     }
 
     if (new_end_pos < last_end_pos) {
-        this->_tft->fillRect(new_end_pos, meter_y, last_end_pos - new_end_pos, METER_THICKNESS, get_word_config(CFG_COLOR_BG));
+        this->_tft->fillRect(new_end_pos, METER_Y, last_end_pos - new_end_pos, METER_THICKNESS, get_word_config(CFG_COLOR_BG));
     }
 
 cleanup:
@@ -89,12 +87,11 @@ void Menu::updateHeading(float heading, uint16_t color, bool init) {
 
     this->_tft->loadFont(BlackOpsOne28);
     
-    this->_tft->setCursor(SCREEN_CENTER, SCREEN_CENTER);
-    this->_tft->setTextDatum(BC_DATUM);
+    this->_tft->setTextDatum(TC_DATUM);
     this->_tft->setTextColor(get_word_config(CFG_COLOR_BG));
-    this->_tft->drawString(previous_str, SCREEN_CENTER, this->_tft->height());
+    this->_tft->drawString(previous_str, SCREEN_CENTER, METER_Y + METER_THICKNESS  + MENU_SPACING + this->large_font_height);
     this->_tft->setTextColor(color);
-    this->_tft->drawString(str, SCREEN_CENTER, this->_tft->height());
+    this->_tft->drawString(str, SCREEN_CENTER, METER_Y + METER_THICKNESS  + MENU_SPACING + this->large_font_height);
 
     this->_tft->unloadFont();
 
@@ -115,11 +112,11 @@ void Menu::updateCentralText(String str, uint16_t color, bool init) {
     this->_tft->loadFont(BlackOpsOne75);
     
     this->_tft->setCursor(SCREEN_CENTER, SCREEN_CENTER);
-    this->_tft->setTextDatum(CC_DATUM);
+    this->_tft->setTextDatum(TC_DATUM);
     this->_tft->setTextColor(get_word_config(CFG_COLOR_BG));
-    this->_tft->drawString(previous_str, SCREEN_CENTER, SCREEN_CENTER);
+    this->_tft->drawString(previous_str, SCREEN_CENTER, METER_Y + METER_THICKNESS + MENU_SPACING);
     this->_tft->setTextColor(color);
-    this->_tft->drawString(str, SCREEN_CENTER, SCREEN_CENTER);
+    this->_tft->drawString(str, SCREEN_CENTER, METER_Y + METER_THICKNESS + MENU_SPACING);
 
     this->_tft->unloadFont();
 
@@ -140,11 +137,11 @@ void Menu::updateMenuTitle(String str, uint16_t color, bool init) {
 
     this->_tft->loadFont(BlackOpsOne28);
     this->_tft->setCursor(SCREEN_CENTER, SCREEN_CENTER);
-    this->_tft->setTextDatum(BC_DATUM);
+    this->_tft->setTextDatum(BL_DATUM);
     this->_tft->setTextColor(get_word_config(CFG_COLOR_BG));
-    this->_tft->drawString(previous_str, SCREEN_CENTER, SCREEN_CENTER - (this->large_font_height / 2));
+    this->_tft->drawString(previous_str, METER_START, this->_tft->height());
     this->_tft->setTextColor(color);
-    this->_tft->drawString(str, SCREEN_CENTER, SCREEN_CENTER - (this->large_font_height / 2));
+    this->_tft->drawString(str, METER_START, this->_tft->height());
 
     this->_tft->unloadFont();
 
@@ -155,8 +152,8 @@ void Menu::display_menu_activity(uint16_t color, bool init) {
     static uint16_t last_color = get_word_config(CFG_COLOR_0);
     if ((last_color == color && this->menu_active) || init);
 
-    if (this->menu_active) {this->_tft->fillCircle(SCREEN_CENTER, 30, 10, color);}
-    else {this->_tft->fillCircle(SCREEN_CENTER, 30, 10, get_word_config(CFG_COLOR_BG));}
+    if (this->menu_active) {this->_tft->fillCircle(SCREEN_CENTER, 200, 10, color);}
+    else {this->_tft->fillCircle(SCREEN_CENTER, 200, 10, get_word_config(CFG_COLOR_BG));}
 
     last_color = color;
 }

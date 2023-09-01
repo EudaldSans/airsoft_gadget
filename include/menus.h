@@ -6,13 +6,19 @@
 #include <TFT_eSPI.h>
 
 #define SCREEN_CENTER       120
+#define SCREEN_WIDTH        240
+#define SCREEN_HEIGHT       240
+
 #define ARC_RADIOUS         120
 #define ARC_START           30
 #define ARC_END             330
 
-#define METER_THICKNESS       10
+#define MENU_SPACING        10
+
+#define METER_THICKNESS     25
 #define METER_WIDTH         230
 #define METER_START         5
+#define METER_Y             10
 
 typedef struct {
     uint16_t total_ammo;

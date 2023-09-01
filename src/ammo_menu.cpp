@@ -44,12 +44,12 @@ void AmmoMenu::drawCountingMode(uint16_t color, bool init) {
 
     Serial.println("Updating mode sprite");
 
-    Menu::_tft->fillRect(SCREEN_CENTER + 55, SCREEN_CENTER - 57, ARROW_WIDTH, ARROW_HEIGHT, get_word_config(CFG_COLOR_BG));
+    Menu::_tft->fillRect(SCREEN_CENTER - ARROW_WIDTH/2, SCREEN_HEIGHT - ARROW_WIDTH - 5, ARROW_WIDTH, ARROW_HEIGHT, get_word_config(CFG_COLOR_BG));
 
     switch (this->counting_mode) {
-        case DECREASE_MODE: Menu::_tft->drawXBitmap(SCREEN_CENTER + 55, SCREEN_CENTER - 57, arrowDown, ARROW_WIDTH, ARROW_HEIGHT, color);       break;
-        case INCREASE_MODE: Menu::_tft->drawXBitmap(SCREEN_CENTER + 55, SCREEN_CENTER - 57, arrowUp, ARROW_WIDTH, ARROW_HEIGHT, color);         break;
-        case TOTAL_MODE:    Menu::_tft->drawXBitmap(SCREEN_CENTER + 55, SCREEN_CENTER - 57, doubleArrow, ARROW_WIDTH, ARROW_HEIGHT, color);     break;
+        case DECREASE_MODE: Menu::_tft->drawXBitmap(SCREEN_CENTER - ARROW_WIDTH/2, SCREEN_HEIGHT - ARROW_WIDTH - 5, arrowDown, ARROW_WIDTH, ARROW_HEIGHT, color);       break;
+        case INCREASE_MODE: Menu::_tft->drawXBitmap(SCREEN_CENTER - ARROW_WIDTH/2, SCREEN_HEIGHT - ARROW_WIDTH - 5, arrowUp, ARROW_WIDTH, ARROW_HEIGHT, color);         break;
+        case TOTAL_MODE:    Menu::_tft->drawXBitmap(SCREEN_CENTER - ARROW_WIDTH/2, SCREEN_HEIGHT - ARROW_WIDTH - 5, doubleArrow, ARROW_WIDTH, ARROW_HEIGHT, color);     break;
         default:            Serial.println("ERROR, tried to paint invalid ammo counting mode");                                                 break;
     }    
 
@@ -57,7 +57,7 @@ void AmmoMenu::drawCountingMode(uint16_t color, bool init) {
 }
 
 void AmmoMenu::clear() {
-    Menu::_tft->fillRect(SCREEN_CENTER + 55, SCREEN_CENTER - 57, ARROW_WIDTH, ARROW_HEIGHT, get_word_config(CFG_COLOR_BG));
+    Menu::_tft->fillRect(SCREEN_CENTER - ARROW_WIDTH/2, SCREEN_HEIGHT - ARROW_WIDTH - 5, ARROW_WIDTH, ARROW_HEIGHT, get_word_config(CFG_COLOR_BG));
 }
 
 void AmmoMenu::scrollUp() {
