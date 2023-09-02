@@ -37,7 +37,9 @@
 
 #define ENCODER_KEY     GPIO_NUM_15
 #define ENCODER_1       GPIO_NUM_23
-#define ENCODER_2       GPIO_NUM_19      
+#define ENCODER_2       GPIO_NUM_19     
+
+#define PERIPHERA_PSU   GPIO_NUM_5
 
 #define LONG_PRESS_TIME_MS      3000
 
@@ -67,8 +69,8 @@ void setup(void) {
     Serial.begin(115200);
     Serial.println("Start");
 
-    pinMode(4, OUTPUT);
-    digitalWrite(4, HIGH);
+    pinMode(PERIPHERA_PSU, OUTPUT);
+    digitalWrite(PERIPHERA_PSU, HIGH);
     delay(25);
 
     init_config();
@@ -155,8 +157,8 @@ void loop() {
         Serial.println("Encoder long press");
         long_press = false;
         tft.fillScreen(TFT_BLACK);
-        rtc_gpio_set_direction(GPIO_NUM_4, RTC_GPIO_MODE_OUTPUT_ONLY);
-        rtc_gpio_set_level(GPIO_NUM_4, 0);
+        rtc_gpio_set_direction(PERIPHERA_PSU, RTC_GPIO_MODE_OUTPUT_ONLY);
+        rtc_gpio_set_level(PERIPHERA_PSU, 0);
 
         rtc_gpio_pullup_en(ENCODER_KEY);
         esp_sleep_enable_ext0_wakeup(ENCODER_KEY, 0);
