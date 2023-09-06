@@ -37,7 +37,14 @@
 
 #define ENCODER_KEY     GPIO_NUM_15
 #define ENCODER_1       GPIO_NUM_23
-#define ENCODER_2       GPIO_NUM_19     
+#define ENCODER_2       GPIO_NUM_19
+
+#define UV_ENABLE       GPIO_NUM_14
+#define IR_SENSOR_0     GPIO_NUM_16
+#define IR_SENSOR_1     GPIO_NUM_34
+
+#define BUTTON_0        GPIO_NUM_33
+#define BUTTON_1        GPIO_NUM_35
 
 #define PERIPHERA_PSU   GPIO_NUM_5
 
@@ -48,7 +55,7 @@
 
 TFT_eSPI tft = TFT_eSPI();
 
-bool init_menu = true, inside_menu = false, long_press = false;
+bool init_menu = true, inside_menu = false, long_press = false, cycle_uv = false;
 
 HMC5883L mag;
 
@@ -57,8 +64,10 @@ Menu* menu_to_clear = NULL;
 uint8_t current_menu;
 
 
-void shot_detected_ISR(void);
+void ir_sensr_0_ISR(void);
+void ir_sensr_1_ISR(void);
 void btn0_ISR(void); 
+void btn1_ISR(void);
 
 void encoder_1_ISR(void);
 void encoder_2_ISR(void);
@@ -69,20 +78,28 @@ void setup(void) {
     Serial.begin(115200);
     Serial.println("Start");
 
+    pinMode(UV_ENABLE, OUTPUT);
+    digitalWrite(PERIPHERA_PSU, LOW);
+
     pinMode(PERIPHERA_PSU, OUTPUT);
     digitalWrite(PERIPHERA_PSU, HIGH);
+
+    pinMode(ENCODER_KEY, INPUT_PULLUP);
+    pinMode(ENCODER_1, INPUT);
+    pinMode(ENCODER_2, INPUT);
+    
     delay(25);
 
     init_config();
     splash_screen_color = get_word_config(CFG_COLOR_2);
 
     tft.begin();
-    tft.setRotation(3);
+    tft.setRotation(1);
     tft.fillScreen(get_word_config(CFG_COLOR_BG));
     tft.drawXBitmap(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_logo_bitmap, RTX_LOGO_W, RTX_LOGO_H, splash_screen_color);
     tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 30, 50, splash_screen_color, TFT_BLACK);
 
-    Wire.setPins(22, 21);
+    Wire.setPins(18, 13);
     // join I2C bus (I2Cdev library doesn't do this automatically)
     Wire.begin();
 
@@ -100,12 +117,15 @@ void setup(void) {
     menus[SETTINGS_MENU]    = new SettingsMenu(&tft);
     current_menu = get_config(CFG_CURRENT_MENU);
 
-    pinMode(ENCODER_KEY, INPUT_PULLUP);
-    pinMode(ENCODER_1, INPUT);
-    pinMode(ENCODER_2, INPUT);
+    // attachInterrupt(15, ir_sensr_0_ISR, FALLING);
+    attachInterrupt(IR_SENSOR_0, ir_sensr_0_ISR, FALLING);
+    attachInterrupt(IR_SENSOR_1, ir_sensr_1_ISR, FALLING);
 
-    // attachInterrupt(15, shot_detected_ISR, FALLING);
-    attachInterrupt(0, btn0_ISR, FALLING);
+    pinMode(BUTTON_0, INPUT_PULLUP);
+    attachInterrupt(BUTTON_0, btn0_ISR, FALLING);
+    pinMode(BUTTON_1, INPUT_PULLUP);
+    attachInterrupt(BUTTON_1, btn1_ISR, FALLING);
+
     attachInterrupt(ENCODER_KEY, encoder_key_event_ISR, CHANGE);
     attachInterrupt(ENCODER_1, encoder_1_ISR, FALLING);
     tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 50, 70, splash_screen_color, TFT_BLACK);
@@ -173,20 +193,33 @@ void loop() {
        Serial.println("Updated all flash values");
     }
 
+    if (cycle_uv) {
+        Serial.println("UV ON");
+        digitalWrite(UV_ENABLE, HIGH);
+    } else {
+        digitalWrite(UV_ENABLE, LOW);
+        Serial.println("UV OFF");
+    }
     delay(100);
 }
 
 
-void IRAM_ATTR shot_detected_ISR(void) {
+void IRAM_ATTR ir_sensr_0_ISR(void) {
     AmmoMenu* ammo_menu = static_cast<AmmoMenu*>(menus[AMMO_MENU]);
     if (ammo_menu != NULL) {ammo_menu->shot();}
 }
 
-void IRAM_ATTR btn0_ISR(void) {
-    menus[current_menu]->btn1();
-    return;
+void IRAM_ATTR ir_sensr_1_ISR(void) {
+    
+}
 
+void IRAM_ATTR btn0_ISR(void) {
     // menus[current_menu]->btn0();
+    cycle_uv = !cycle_uv;
+}
+
+void IRAM_ATTR btn1_ISR(void) {
+    menus[current_menu]->btn1();
 }
 
 void IRAM_ATTR encoder_1_ISR(void) {

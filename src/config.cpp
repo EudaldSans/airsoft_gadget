@@ -8,7 +8,7 @@ void init_config() {
     EEPROM.begin(LEN_CONFIGS);
     log_i("EEPROM length: %d", EEPROM.length());
 
-    if (EEPROM.read(0) == LEN_CONFIGS) {
+    if (EEPROM.read(0) != LEN_CONFIGS) {
         log_i("Flashing EEPROM with default configs");
         update_config(CFG_BOARD_INITIALIZED, LEN_CONFIGS);
         update_config(CFG_CURRENT_MENU, CURRENT_MENU_DEFAULT);

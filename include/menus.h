@@ -4,6 +4,7 @@
 
 #include <SPI.h>
 #include <TFT_eSPI.h>
+#include "config.h"
 
 #define SCREEN_CENTER       120
 #define SCREEN_WIDTH        240
@@ -49,6 +50,16 @@ typedef enum {
     CHRONO_FPS,
     NUMBER_OF_UNITS
 } chrono_units_t;
+
+typedef enum {
+    MAIN_SETTINGS_MENU = 0,
+    AMMO_SETTINGS,
+    CHRONO_SETTINGS,
+    KDR_SETTINGS,
+    COLOR_SETTINGS,
+    TIME_SETTINGS,
+    NUMBER_OF_SETTING_MENUS
+} setting_menus_t;
 
 
 class Menu {
@@ -159,10 +170,28 @@ class SettingsMenu : public Menu {
         void drawSliderSetting(uint16_t min, uint16_t max, uint16_t pos);
         void drawColorSetting(uint32_t current_color);
         void drawStringSetting(bool draw_left, bool draw_right, String current_text);
-        void drawYesNoSetting(bool current_setting);
+        void drawYesNoSetting(bool highlighted_setting);
 
-        void drawMainMenu(bool init);
+        void drawMenu(uint8_t highlighted_setting, String* setting_names, uint8_t max_settings, bool init);
 
-        int8_t current_setting = 0, previous_setting = 0xff;
+        void main_settings_key_press();
+        void ammo_settings_key_press();
+        void chrono_settings_key_press();
+        void kdr_settings_key_press();
+        void color_settings_key_press();
+
+        int8_t highlighted_setting = 0, previous_setting = 0xff;
+        setting_menus_t current_menu = MAIN_SETTINGS_MENU;
+        bool key_pressed = false, menu_up = false, menu_down = false;
         
 };
+
+// class Setting {
+//     public:
+//         Setting(String name, config_t setting_id, bool is_setting_word);
+// };
+
+// class SettingSubmenu {
+//     public: 
+//         SettingSubmenu(TFT_eSPI* p_tft, Setting* menu_settings);
+// };
