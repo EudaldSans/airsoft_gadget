@@ -39,18 +39,11 @@
 #define UP_BUTTON       GPIO_NUM_23
 #define DOWN_BUTTON     GPIO_NUM_19
 
-#define ENCODER_KEY     GPIO_NUM_15
-#define ENCODER_1       GPIO_NUM_23
-#define ENCODER_2       GPIO_NUM_19
-
 #define UV_ENABLE       GPIO_NUM_14
 #define IR_SENSOR_0     GPIO_NUM_16
 #define IR_SENSOR_1     GPIO_NUM_34
 
-#define BUTTON_0        GPIO_NUM_33
-#define BUTTON_1        GPIO_NUM_35
-
-#define PERIPHERA_PSU   GPIO_NUM_5
+#define PERIPHERAL_PSU  GPIO_NUM_5
 
 #define FLASH_UPDATE_PERIOD_MS  500
 #define DEBOUNCE_TIME_MS        50
@@ -81,21 +74,25 @@ void setup(void) {
     Serial.begin(115200);
     Serial.println("Start");
 
+    // Setup all GPIOs
     pinMode(UV_ENABLE, OUTPUT);
-    digitalWrite(PERIPHERA_PSU, LOW);
+    digitalWrite(PERIPHERAL_PSU, LOW);   // PSU is specially important since it powers all other components of the device
 
-    pinMode(PERIPHERA_PSU, OUTPUT);
-    digitalWrite(PERIPHERA_PSU, HIGH);
+    pinMode(PERIPHERAL_PSU, OUTPUT);
+    digitalWrite(PERIPHERAL_PSU, HIGH);
 
     pinMode(ENTER_BUTTON, INPUT_PULLUP);
     pinMode(UP_BUTTON, INPUT_PULLUP);
     pinMode(DOWN_BUTTON, INPUT_PULLUP);
     
+    // Wait for a bit for all peripherals to boot up, could be lower
     delay(25);
 
+    // Initialize flash storage and recover color config
     init_config();
     splash_screen_color = get_word_config(CFG_COLOR_2);
 
+    // Initialize LCD scrreen, set correct rotation
     tft.begin();
     tft.setRotation(1);
     tft.fillScreen(get_word_config(CFG_COLOR_BG));
@@ -103,32 +100,34 @@ void setup(void) {
     tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 30, 50, splash_screen_color, TFT_BLACK);
 
     Wire.setPins(18, 13);
-    // join I2C bus (I2Cdev library doesn't do this automatically)
+    // Join I2C bus (I2Cdev library doesn't do this automatically)
     Wire.begin();
 
-    // initialize device
+    // Initialize device
     Serial.println("Initializing I2C devices...");
     mag.initialize();
 
-    // verify connection
+    // Verify connection
     Serial.println("Testing device connections...");
     Serial.println(mag.testConnection() ? "HMC5883L connection successful" : "HMC5883L connection failed");
     
+    // Prepare menus and set current menu to what is stored in flash
     menus[AMMO_MENU]        = new AmmoMenu(&tft);
     menus[KDR_MENU]         = new KDRMenu(&tft);
     menus[CHRONO_MENU]      = new ChronoMenu(&tft);
     menus[SETTINGS_MENU]    = new SettingsMenu(&tft);
     current_menu = get_config(CFG_CURRENT_MENU);
 
-    // attachInterrupt(15, ir_sensr_0_ISR, FALLING);
+    // Attatch all interrupts
     attachInterrupt(IR_SENSOR_0, ir_sensr_0_ISR, FALLING);
     attachInterrupt(IR_SENSOR_1, ir_sensr_1_ISR, FALLING);
 
     attachInterrupt(ENTER_BUTTON, button_enter_ISR, CHANGE);
     attachInterrupt(UP_BUTTON, button_up_ISR, CHANGE);
     attachInterrupt(DOWN_BUTTON, button_down_ISR, CHANGE);
-    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 50, 70, splash_screen_color, TFT_BLACK);
 
+    // Draw a loading arc to make it look like we are doing some work while we show the logo
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 50, 70, splash_screen_color, TFT_BLACK);
     delay(100);
     tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 70, 90, splash_screen_color, TFT_BLACK);
     delay(150);
@@ -142,7 +141,7 @@ void setup(void) {
     delay(300);
     tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 225, ARC_END, splash_screen_color, TFT_BLACK);
     
-
+    // Clear the loading screen
     tft.fillScreen(get_word_config(CFG_COLOR_BG));
 }
 
@@ -154,7 +153,7 @@ void loop() {
     static unsigned long last_flash_update = 0;
     unsigned long now = millis();
     
-    // read raw heading measurements from device
+    // Read raw heading measurements from device
     mag.getHeading(&mx, &my, &mz);
     
     // To calculate heading in degrees. 0 degree indicates North
@@ -167,26 +166,27 @@ void loop() {
         menu_to_clear = NULL;
     }
 
-    if (init_menu) {
-        update_config(CFG_CURRENT_MENU, current_menu);
-    }
+    // Update flash values if a new menu is being displayed
+    if (init_menu) {update_config(CFG_CURRENT_MENU, current_menu);}
 
+    // Update current menu
     menus[current_menu]->update(heading, init_menu);
     init_menu = false;
 
     if (go_to_sleep) {
         Serial.println("Going to sleep. zZz zZz zZz...");
 
-        tft.fillScreen(TFT_BLACK);        
         save_all_configs();
 
-        rtc_gpio_set_direction(PERIPHERA_PSU, RTC_GPIO_MODE_OUTPUT_ONLY);
-        rtc_gpio_set_level(PERIPHERA_PSU, 0);
+        // Turn off all peripherals
+        rtc_gpio_set_direction(PERIPHERAL_PSU, RTC_GPIO_MODE_OUTPUT_ONLY);
+        rtc_gpio_set_level(PERIPHERAL_PSU, 0);
 
-        rtc_gpio_pullup_en(ENCODER_KEY);
-        esp_sleep_enable_ext0_wakeup(ENCODER_KEY, 0);
+        // Set enter button to wake up the device
+        rtc_gpio_pullup_en(ENTER_BUTTON);
+        esp_sleep_enable_ext0_wakeup(ENTER_BUTTON, 0);
 
-        delay(50);
+        // Go to sleep
         esp_deep_sleep_start();
     }
 
@@ -196,6 +196,7 @@ void loop() {
        Serial.println("Updated all flash values");
     }
 
+    // There is no need to stress the MCU, ~10fps are more than enough.
     delay(100);
 }
 
