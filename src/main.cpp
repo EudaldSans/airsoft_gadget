@@ -193,13 +193,6 @@ void loop() {
        Serial.println("Updated all flash values");
     }
 
-    if (cycle_uv) {
-        Serial.println("UV ON");
-        digitalWrite(UV_ENABLE, HIGH);
-    } else {
-        digitalWrite(UV_ENABLE, LOW);
-        Serial.println("UV OFF");
-    }
     delay(100);
 }
 
@@ -214,8 +207,7 @@ void IRAM_ATTR ir_sensr_1_ISR(void) {
 }
 
 void IRAM_ATTR btn0_ISR(void) {
-    // menus[current_menu]->btn0();
-    cycle_uv = !cycle_uv;
+    menus[current_menu]->btn0();
 }
 
 void IRAM_ATTR btn1_ISR(void) {

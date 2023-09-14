@@ -42,7 +42,10 @@ void KDRMenu::btn0() {
     this->kills++;
 };
 
-void KDRMenu::btn1() {};
+void KDRMenu::btn1() {
+    this->deaths--;
+};
+
 void KDRMenu::btn2() {};
 
 
