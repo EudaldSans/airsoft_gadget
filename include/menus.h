@@ -70,13 +70,9 @@ class Menu {
         virtual void update(float heading, bool init);
         virtual void clear();
 
-        virtual void btn0();
-        virtual void btn1();
-        virtual void btn2();
-
-        virtual void scrollUp();
-        virtual void scrollDown();
-        virtual bool scrollKey();
+        virtual void enter_button(unsigned long press_duration);
+        virtual void up_button(unsigned long press_duration);
+        virtual void down_button(unsigned long press_duration);
     
     protected:
         void updateHeading(float, uint16_t color, bool init);
@@ -101,8 +97,8 @@ class AmmoMenu : public Menu {
 
         void update(float heading, bool init);
 
-        void scrollUp();
-        void scrollDown();
+        void up_button(unsigned long press_duration);
+        void down_button(unsigned long press_duration);
         void shot();
 
         void clear();
@@ -123,9 +119,9 @@ class KDRMenu : public Menu {
 
         void update(float heading, bool init);
 
-        void btn0();
-        void btn1();
-        void btn2();
+        void enter_button(unsigned long press_duration);
+        void up_button(unsigned long press_duration);
+        void down_button(unsigned long press_duration);
 
 
     private:
@@ -140,8 +136,8 @@ class ChronoMenu : public Menu {
 
         void update(float heading, bool init);
 
-        void scrollUp();
-        void scrollDown();
+        void up_button(unsigned long press_duration);
+        void down_button(unsigned long press_duration);
 
         void clear();
 
@@ -160,9 +156,9 @@ class SettingsMenu : public Menu {
 
         void update(float heading, bool init);
 
-        void scrollUp();
-        void scrollDown();
-        bool scrollKey();
+        void enter_button(unsigned long press_duration);
+        void up_button(unsigned long press_duration);
+        void down_button(unsigned long press_duration);
 
         void clear();
 

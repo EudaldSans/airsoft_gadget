@@ -35,6 +35,10 @@
 
 #include <driver/rtc_io.h>
 
+#define ENTER_BUTTON    GPIO_NUM_15
+#define UP_BUTTON       GPIO_NUM_23
+#define DOWN_BUTTON     GPIO_NUM_19
+
 #define ENCODER_KEY     GPIO_NUM_15
 #define ENCODER_1       GPIO_NUM_23
 #define ENCODER_2       GPIO_NUM_19
@@ -206,62 +210,65 @@ void IRAM_ATTR ir_sensr_1_ISR(void) {
     
 }
 
-void IRAM_ATTR btn0_ISR(void) {
-    menus[current_menu]->btn0();
-}
-
-void IRAM_ATTR btn1_ISR(void) {
-    menus[current_menu]->btn1();
-}
-
-void IRAM_ATTR encoder_1_ISR(void) {
-    static unsigned long last_encoder_change = 0;
+void IRAM_ATTR button_up_ISR(void) {
+    static unsigned long button_press_time = 0, last_event = 0;
     unsigned long now = millis();
 
-    // Debounce ISR
-    if (now - last_encoder_change <= 100) {return;}
-    
-    // Since ISR activates on falling edge, if ENCODER_2 is 1 we ar turning CW, otherwise CCW
-    if (digitalRead(ENCODER_2)) { // Turning clock wise
-        if (inside_menu) {
-            menus[current_menu]->scrollUp();
-        } else {
-            if (menu_to_clear == NULL) {menu_to_clear = menus[current_menu];}
-            current_menu++;
-            if (current_menu >= NUMBER_OF_MENUS) {current_menu = 0;}
-            init_menu = true;
-        }
-    } else { // turning counter clock wise
-        if (inside_menu) {
-            menus[current_menu]->scrollDown();
-        } else {
-            if (menu_to_clear == NULL) {menu_to_clear = menus[current_menu];}
-            current_menu--;
-            if (current_menu >= NUMBER_OF_MENUS) {current_menu = NUMBER_OF_MENUS - 1;}
-            init_menu = true;
-        }
-    }
-
-    last_encoder_change = now;
-}
-
-void IRAM_ATTR encoder_key_event_ISR(void) {
-    static unsigned long last_encoder_press = 0, last_event = 0;
-    unsigned long now = millis();
-
+    // Debounce the interrupt
     if (now - last_event < 50) {return;}
+    last_event = now;
 
-    if (digitalRead(ENCODER_KEY)) {
-        if ((now - last_encoder_press) < LONG_PRESS_TIME_MS)    {inside_menu = menus[current_menu]->scrollKey();} 
-        else                                                    {long_press = true;}
-    
-    } else {
-        last_encoder_press = millis();
+    if (!digitalRead(UP_BUTTON)) {
+        button_press_time = now;
+        return;
     }
 
-    last_event = now;
+    if (inside_menu) {menus[current_menu]->up_button(now - button_press_time);}
+    else {
+        if (menu_to_clear == NULL) {menu_to_clear = menus[current_menu];}
+        current_menu++;
+        if (current_menu >= NUMBER_OF_MENUS) {current_menu = 0;}
+        init_menu = true;
+    }
 }
 
+void IRAM_ATTR button_down_ISR(void) {
+    static unsigned long button_press_time = 0, last_event = 0;
+    unsigned long now = millis();
 
+    // Debounce the interrupt
+    if (now - last_event < 50) {return;}
+    last_event = now;
+
+    if (!digitalRead(DOWN_BUTTON)) {
+        button_press_time = now;
+        return;
+    }
+
+    if (inside_menu) {menus[current_menu]->down_button(now - button_press_time);}
+    else {
+        if (menu_to_clear == NULL) {menu_to_clear = menus[current_menu];}
+        current_menu--;
+        if (current_menu >= NUMBER_OF_MENUS) {current_menu = NUMBER_OF_MENUS - 1;}
+        init_menu = true;
+    }
+}
+
+void IRAM_ATTR button_enter_ISR(void) {
+    static unsigned long button_press_time = 0, last_event = 0;
+    unsigned long now = millis();
+
+    // Debounce the interrupt
+    if (now - last_event < 50) {return;}
+    last_event = now;
+
+    if (!digitalRead(ENTER_BUTTON)) {
+        button_press_time = now;
+        return;
+    }
+
+    if ((now - button_press_time) < LONG_PRESS_TIME_MS)    {inside_menu = menus[current_menu]->enter_button(now - button_press_time);} 
+    else                                                    {long_press = true;}
+}
 
 
