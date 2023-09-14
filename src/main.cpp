@@ -53,11 +53,12 @@
 #define PERIPHERA_PSU   GPIO_NUM_5
 
 #define FLASH_UPDATE_PERIOD_MS  500
+#define DEBOUNCE_TIME_MS        50
 
 
 TFT_eSPI tft = TFT_eSPI();
 
-bool init_menu = true, inside_menu = false, long_press = false, cycle_uv = false;
+bool init_menu = true, inside_menu = false, go_to_sleep = false, cycle_uv = false;
 
 HMC5883L mag;
 
@@ -72,6 +73,9 @@ void button_down_ISR(void);
 void ir_sensr_0_ISR(void);
 void ir_sensr_1_ISR(void);
 
+/** 
+ * @brief Setup function is called at the start of the program, sets up all peripherals and instantiates menus.
+*/
 void setup(void) {
     uint32_t splash_screen_color;
     Serial.begin(115200);
@@ -142,7 +146,9 @@ void setup(void) {
     tft.fillScreen(get_word_config(CFG_COLOR_BG));
 }
 
-
+/**
+ * @brief Main loop. Updates heading, updates current menu and clears previous one, updates flash values and makes MCU sleep when prompted
+*/
 void loop() {
     int16_t mx, my, mz;
     static unsigned long last_flash_update = 0;
@@ -168,17 +174,19 @@ void loop() {
     menus[current_menu]->update(heading, init_menu);
     init_menu = false;
 
-    if (long_press) {
-        Serial.println("Encoder long press");
-        long_press = false;
-        tft.fillScreen(TFT_BLACK);
+    if (go_to_sleep) {
+        Serial.println("Going to sleep. zZz zZz zZz...");
+
+        tft.fillScreen(TFT_BLACK);        
+        save_all_configs();
+
         rtc_gpio_set_direction(PERIPHERA_PSU, RTC_GPIO_MODE_OUTPUT_ONLY);
         rtc_gpio_set_level(PERIPHERA_PSU, 0);
 
         rtc_gpio_pullup_en(ENCODER_KEY);
         esp_sleep_enable_ext0_wakeup(ENCODER_KEY, 0);
 
-        delay(100);
+        delay(50);
         esp_deep_sleep_start();
     }
 
@@ -191,22 +199,30 @@ void loop() {
     delay(100);
 }
 
-
+/**
+ * @brief Interrupt trigger by IR sensor 1. Informa @c AmmoMenu that a shot has been dected.
+*/
 void IRAM_ATTR ir_sensr_0_ISR(void) {
     AmmoMenu* ammo_menu = static_cast<AmmoMenu*>(menus[AMMO_MENU]);
     if (ammo_menu != NULL) {ammo_menu->shot();}
 }
 
+/**
+ * @brief Interrupt trigger by IR sensor 1. 
+ * @todo Calculates speed using info from IR sensor 0 and updates chrono menu.
+*/
 void IRAM_ATTR ir_sensr_1_ISR(void) {
     
 }
 
+/**
+ * @brief Interrupt triggered by the button up. If outside menu cycles menu up, if inside calls @c up_button() from menu.
+*/
 void IRAM_ATTR button_up_ISR(void) {
     static unsigned long button_press_time = 0, last_event = 0;
     unsigned long now = millis();
 
-    // Debounce the interrupt
-    if (now - last_event < 50) {return;}
+    if (now - last_event < DEBOUNCE_TIME_MS) {return;}
     last_event = now;
 
     if (!digitalRead(UP_BUTTON)) {
@@ -223,12 +239,14 @@ void IRAM_ATTR button_up_ISR(void) {
     }
 }
 
+/**
+ * @brief Interrupt triggered by the button down. If outside menu cycles menu down, if inside calls @c down_button() from menu.
+*/
 void IRAM_ATTR button_down_ISR(void) {
     static unsigned long button_press_time = 0, last_event = 0;
     unsigned long now = millis();
 
-    // Debounce the interrupt
-    if (now - last_event < 50) {return;}
+    if (now - last_event < DEBOUNCE_TIME_MS) {return;}
     last_event = now;
 
     if (!digitalRead(DOWN_BUTTON)) {
@@ -245,12 +263,14 @@ void IRAM_ATTR button_down_ISR(void) {
     }
 }
 
+/**
+ * @brief Interrupt triggered by the button enter. If press is short it calls @c enter_button() from current menu, otherwise the MCU goes to sleep.
+*/
 void IRAM_ATTR button_enter_ISR(void) {
     static unsigned long button_press_time = 0, last_event = 0;
     unsigned long now = millis();
 
-    // Debounce the interrupt
-    if (now - last_event < 50) {return;}
+    if (now - last_event < DEBOUNCE_TIME_MS) {return;}
     last_event = now;
 
     if (!digitalRead(ENTER_BUTTON)) {
@@ -259,7 +279,7 @@ void IRAM_ATTR button_enter_ISR(void) {
     }
 
     if ((now - button_press_time) < LONG_PRESS_TIME_MS)    {inside_menu = menus[current_menu]->enter_button(now - button_press_time);} 
-    else                                                    {long_press = true;}
+    else                                                   {go_to_sleep = true;}
 }
 
 
