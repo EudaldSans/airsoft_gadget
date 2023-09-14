@@ -166,14 +166,10 @@ void Menu::update(float heading, bool init) {
 
 void Menu::clear() {Serial.println("Called menu clear!");}
 
-void Menu::btn0()         {Serial.println("Called menu btn0!");}
-void Menu::btn1()         {Serial.println("Called menu btn1!");}
-void Menu::btn2()         {Serial.println("Called menu btn2!");}
+void Menu::up_button(unsigned long press_duration)     {Serial.println("Called menu ScrollUp!");}
+void Menu::down_button(unsigned long press_duration)   {Serial.println("Called menu scrollDown!");}
 
-void Menu::scrollUp()     {Serial.println("Called menu ScrollUp!");}
-void Menu::scrollDown()   {Serial.println("Called menu scrollDown!");}
-
-bool Menu::scrollKey()    {
+bool Menu::enter_button(unsigned long press_duration)    {
     Serial.println("Called menu ScrollKey");
     this->menu_active = !this->menu_active;
     return this->menu_active;

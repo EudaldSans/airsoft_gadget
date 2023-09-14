@@ -52,8 +52,6 @@
 
 #define PERIPHERA_PSU   GPIO_NUM_5
 
-#define LONG_PRESS_TIME_MS      3000
-
 #define FLASH_UPDATE_PERIOD_MS  500
 
 
@@ -67,15 +65,12 @@ Menu* menus[NUMBER_OF_MENUS];
 Menu* menu_to_clear = NULL;
 uint8_t current_menu;
 
+void button_enter_ISR(void);
+void button_up_ISR(void);
+void button_down_ISR(void);
 
 void ir_sensr_0_ISR(void);
 void ir_sensr_1_ISR(void);
-void btn0_ISR(void); 
-void btn1_ISR(void);
-
-void encoder_1_ISR(void);
-void encoder_2_ISR(void);
-void encoder_key_event_ISR(void);
 
 void setup(void) {
     uint32_t splash_screen_color;
@@ -88,9 +83,9 @@ void setup(void) {
     pinMode(PERIPHERA_PSU, OUTPUT);
     digitalWrite(PERIPHERA_PSU, HIGH);
 
-    pinMode(ENCODER_KEY, INPUT_PULLUP);
-    pinMode(ENCODER_1, INPUT);
-    pinMode(ENCODER_2, INPUT);
+    pinMode(ENTER_BUTTON, INPUT_PULLUP);
+    pinMode(UP_BUTTON, INPUT_PULLUP);
+    pinMode(DOWN_BUTTON, INPUT_PULLUP);
     
     delay(25);
 
@@ -125,13 +120,9 @@ void setup(void) {
     attachInterrupt(IR_SENSOR_0, ir_sensr_0_ISR, FALLING);
     attachInterrupt(IR_SENSOR_1, ir_sensr_1_ISR, FALLING);
 
-    pinMode(BUTTON_0, INPUT_PULLUP);
-    attachInterrupt(BUTTON_0, btn0_ISR, FALLING);
-    pinMode(BUTTON_1, INPUT_PULLUP);
-    attachInterrupt(BUTTON_1, btn1_ISR, FALLING);
-
-    attachInterrupt(ENCODER_KEY, encoder_key_event_ISR, CHANGE);
-    attachInterrupt(ENCODER_1, encoder_1_ISR, FALLING);
+    attachInterrupt(ENTER_BUTTON, button_enter_ISR, CHANGE);
+    attachInterrupt(UP_BUTTON, button_up_ISR, CHANGE);
+    attachInterrupt(DOWN_BUTTON, button_down_ISR, CHANGE);
     tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 50, 70, splash_screen_color, TFT_BLACK);
 
     delay(100);

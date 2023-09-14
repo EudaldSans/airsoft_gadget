@@ -38,14 +38,15 @@ void KDRMenu::update(float heading, bool init) {
     Menu::display_menu_activity(color, init);
 }
 
-void KDRMenu::btn0() {
-    this->kills++;
+void KDRMenu::up_button (unsigned long press_duration) {
+    if (press_duration < LONG_PRESS_TIME_MS) {this->kills++;}
+    else {this->kills = 0;}
 };
 
-void KDRMenu::btn1() {
-    this->deaths--;
+void KDRMenu::down_button (unsigned long press_duration) {
+    if (press_duration < LONG_PRESS_TIME_MS) {this->deaths++;}
+    else {this->deaths = 0;}
 };
 
-void KDRMenu::btn2() {};
 
 

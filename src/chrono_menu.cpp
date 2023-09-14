@@ -70,15 +70,9 @@ void ChronoMenu::drawUnits(uint16_t color, bool init) {
     previous_unit = (chrono_units_t) this->units;
 }
 
-void ChronoMenu::scrollUp() {
+void ChronoMenu::up_button(unsigned long press_duration) {
     this->units++;
     if (this->units >= NUMBER_OF_UNITS) {this->units = 0;}
-    update_config(CFG_CHRONO_UNIT, this->units);
-}
-
-void ChronoMenu::scrollDown() {
-    this->units--;
-    if (this->units < 0) {this->units = NUMBER_OF_UNITS - 1;}
     update_config(CFG_CHRONO_UNIT, this->units);
 }
 

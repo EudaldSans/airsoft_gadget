@@ -135,7 +135,7 @@ void SettingsMenu::clear() {
     this->_tft->fillScreen(get_word_config(CFG_COLOR_BG));
 }
 
-void SettingsMenu::scrollUp() {
+void SettingsMenu::up_button(unsigned long press_duration) {
     this->highlighted_setting++;
 
     switch (this->current_menu) {
@@ -148,7 +148,7 @@ void SettingsMenu::scrollUp() {
     }
 }
 
-void SettingsMenu::scrollDown() {
+void SettingsMenu::down_button(unsigned long press_duration) {
     this->highlighted_setting--;
 
     switch (this->current_menu) {
@@ -161,13 +161,13 @@ void SettingsMenu::scrollDown() {
     }
 }
 
-bool SettingsMenu::scrollKey() {
+bool SettingsMenu::enter_button(unsigned long press_duration) {
     this->previous_setting = 0xff;
 
-    if (!this->menu_active) {return Menu::scrollKey();}
+    if (!this->menu_active) {return Menu::enter_button(press_duration);}
 
     if (this->current_menu == MAIN_SETTINGS_MENU && this->highlighted_setting == 5) {
-        return Menu::scrollKey();
+        return Menu::enter_button(press_duration);
     } 
 
     switch (this->current_menu) {

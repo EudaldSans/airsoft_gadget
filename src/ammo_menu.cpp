@@ -60,17 +60,17 @@ void AmmoMenu::clear() {
     Menu::_tft->fillRect(SCREEN_CENTER - ARROW_WIDTH/2, SCREEN_HEIGHT - ARROW_WIDTH - 5, ARROW_WIDTH, ARROW_HEIGHT, get_word_config(CFG_COLOR_BG));
 }
 
-void AmmoMenu::scrollUp() {
+
+void AmmoMenu::up_button(unsigned long press_duration) {
     this->counting_mode++;
     if (this->counting_mode >= NUMBER_OF_MODES) {this->counting_mode = 0;}
     update_config(CFG_AMMO_COUNT_SETTING, this->counting_mode);
 }
 
-void AmmoMenu::scrollDown() {
-    this->counting_mode--;
-    if (this->counting_mode < 0) {this->counting_mode = NUMBER_OF_MODES - 1;}
-    update_config(CFG_AMMO_COUNT_SETTING, this->counting_mode);
+void AmmoMenu::down_button(unsigned long press_duration) {
+    this->current_ammo = get_word_config(CFG_AMMO_MAG_SIZE);
 }
+
 
 void AmmoMenu::shot() {
     if (this->current_ammo > 0) {

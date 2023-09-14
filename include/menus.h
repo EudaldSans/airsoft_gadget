@@ -21,6 +21,8 @@
 #define METER_START         5
 #define METER_Y             10
 
+#define LONG_PRESS_TIME_MS      3000
+
 typedef struct {
     uint16_t total_ammo;
     uint16_t current_ammo;
@@ -70,7 +72,7 @@ class Menu {
         virtual void update(float heading, bool init);
         virtual void clear();
 
-        virtual void enter_button(unsigned long press_duration);
+        virtual bool enter_button(unsigned long press_duration);
         virtual void up_button(unsigned long press_duration);
         virtual void down_button(unsigned long press_duration);
     
@@ -119,7 +121,6 @@ class KDRMenu : public Menu {
 
         void update(float heading, bool init);
 
-        void enter_button(unsigned long press_duration);
         void up_button(unsigned long press_duration);
         void down_button(unsigned long press_duration);
 
@@ -137,7 +138,6 @@ class ChronoMenu : public Menu {
         void update(float heading, bool init);
 
         void up_button(unsigned long press_duration);
-        void down_button(unsigned long press_duration);
 
         void clear();
 
@@ -156,7 +156,7 @@ class SettingsMenu : public Menu {
 
         void update(float heading, bool init);
 
-        void enter_button(unsigned long press_duration);
+        bool enter_button(unsigned long press_duration);
         void up_button(unsigned long press_duration);
         void down_button(unsigned long press_duration);
 
