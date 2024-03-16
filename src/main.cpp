@@ -35,9 +35,7 @@
 
 #include <driver/rtc_io.h>
 
-#define ENTER_BUTTON    GPIO_NUM_15
-#define UP_BUTTON       GPIO_NUM_23
-#define DOWN_BUTTON     GPIO_NUM_19
+#include "buttons.h"
 
 #define UV_ENABLE       GPIO_NUM_14
 #define IR_SENSOR_0     GPIO_NUM_16
@@ -46,7 +44,6 @@
 #define PERIPHERAL_PSU  GPIO_NUM_5
 
 #define FLASH_UPDATE_PERIOD_MS  500
-#define DEBOUNCE_TIME_MS        50
 
 
 TFT_eSPI tft = TFT_eSPI();
@@ -59,9 +56,6 @@ Menu* menus[NUMBER_OF_MENUS];
 Menu* menu_to_clear = NULL;
 uint8_t current_menu;
 
-void button_enter_ISR(void);
-void button_up_ISR(void);
-void button_down_ISR(void);
 
 void ir_sensr_0_ISR(void);
 void ir_sensr_1_ISR(void);
@@ -74,6 +68,9 @@ void setup(void) {
     Serial.begin(115200);
     Serial.println("Start");
 
+    init_buttons();
+    return;
+
     // Setup all GPIOs
     pinMode(UV_ENABLE, OUTPUT);
     digitalWrite(PERIPHERAL_PSU, LOW);   // PSU is specially important since it powers all other components of the device
@@ -81,10 +78,6 @@ void setup(void) {
     pinMode(PERIPHERAL_PSU, OUTPUT);
     digitalWrite(PERIPHERAL_PSU, HIGH);
 
-    pinMode(ENTER_BUTTON, INPUT_PULLUP);
-    pinMode(UP_BUTTON, INPUT_PULLUP);
-    pinMode(DOWN_BUTTON, INPUT_PULLUP);
-    
     // Wait for a bit for all peripherals to boot up, could be lower
     delay(25);
 
@@ -122,10 +115,6 @@ void setup(void) {
     attachInterrupt(IR_SENSOR_0, ir_sensr_0_ISR, FALLING);
     attachInterrupt(IR_SENSOR_1, ir_sensr_1_ISR, FALLING);
 
-    attachInterrupt(ENTER_BUTTON, button_enter_ISR, CHANGE);
-    attachInterrupt(UP_BUTTON, button_up_ISR, CHANGE);
-    attachInterrupt(DOWN_BUTTON, button_down_ISR, CHANGE);
-
     // Draw a loading arc to make it look like we are doing some work while we show the logo
     tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 50, 70, splash_screen_color, TFT_BLACK);
     delay(100);
@@ -152,6 +141,9 @@ void loop() {
     int16_t mx, my, mz;
     static unsigned long last_flash_update = 0;
     unsigned long now = millis();
+
+    check_buttons();
+    return;
     
     // Read raw heading measurements from device
     mag.getHeading(&mx, &my, &mz);
@@ -182,12 +174,12 @@ void loop() {
         rtc_gpio_set_direction(PERIPHERAL_PSU, RTC_GPIO_MODE_OUTPUT_ONLY);
         rtc_gpio_set_level(PERIPHERAL_PSU, 0);
 
-        // Set enter button to wake up the device
-        rtc_gpio_pullup_en(ENTER_BUTTON);
-        esp_sleep_enable_ext0_wakeup(ENTER_BUTTON, 0);
+        // // Set enter button to wake up the device
+        // rtc_gpio_pullup_en(ENTER_BUTTON);
+        // esp_sleep_enable_ext0_wakeup(ENTER_BUTTON, 0);
 
-        // Go to sleep
-        esp_deep_sleep_start();
+        // // Go to sleep
+        // esp_deep_sleep_start();
     }
 
     if ((now - last_flash_update) > FLASH_UPDATE_PERIOD_MS) {
@@ -214,73 +206,6 @@ void IRAM_ATTR ir_sensr_0_ISR(void) {
 */
 void IRAM_ATTR ir_sensr_1_ISR(void) {
     
-}
-
-/**
- * @brief Interrupt triggered by the button up. If outside menu cycles menu up, if inside calls @c up_button() from menu.
-*/
-void IRAM_ATTR button_up_ISR(void) {
-    static unsigned long button_press_time = 0, last_event = 0;
-    unsigned long now = millis();
-
-    if (now - last_event < DEBOUNCE_TIME_MS) {return;}
-    last_event = now;
-
-    if (!digitalRead(UP_BUTTON)) {
-        button_press_time = now;
-        return;
-    }
-
-    if (inside_menu) {menus[current_menu]->up_button(now - button_press_time);}
-    else {
-        if (menu_to_clear == NULL) {menu_to_clear = menus[current_menu];}
-        current_menu++;
-        if (current_menu >= NUMBER_OF_MENUS) {current_menu = 0;}
-        init_menu = true;
-    }
-}
-
-/**
- * @brief Interrupt triggered by the button down. If outside menu cycles menu down, if inside calls @c down_button() from menu.
-*/
-void IRAM_ATTR button_down_ISR(void) {
-    static unsigned long button_press_time = 0, last_event = 0;
-    unsigned long now = millis();
-
-    if (now - last_event < DEBOUNCE_TIME_MS) {return;}
-    last_event = now;
-
-    if (!digitalRead(DOWN_BUTTON)) {
-        button_press_time = now;
-        return;
-    }
-
-    if (inside_menu) {menus[current_menu]->down_button(now - button_press_time);}
-    else {
-        if (menu_to_clear == NULL) {menu_to_clear = menus[current_menu];}
-        current_menu--;
-        if (current_menu >= NUMBER_OF_MENUS) {current_menu = NUMBER_OF_MENUS - 1;}
-        init_menu = true;
-    }
-}
-
-/**
- * @brief Interrupt triggered by the button enter. If press is short it calls @c enter_button() from current menu, otherwise the MCU goes to sleep.
-*/
-void IRAM_ATTR button_enter_ISR(void) {
-    static unsigned long button_press_time = 0, last_event = 0;
-    unsigned long now = millis();
-
-    if (now - last_event < DEBOUNCE_TIME_MS) {return;}
-    last_event = now;
-
-    if (!digitalRead(ENTER_BUTTON)) {
-        button_press_time = now;
-        return;
-    }
-
-    if ((now - button_press_time) < LONG_PRESS_TIME_MS)    {inside_menu = menus[current_menu]->enter_button(now - button_press_time);} 
-    else                                                   {go_to_sleep = true;}
 }
 
 

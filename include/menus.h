@@ -150,6 +150,19 @@ class ChronoMenu : public Menu {
         String title = "Chrono";
 };
 
+class Setting {
+    public:
+        // Setting(String name, config_t setting_id, bool is_setting_word);
+        Setting(String name, uint8_t setting_id, bool is_setting_word);
+
+        void update(bool init);
+};
+
+class SettingSubmenu {
+    public: 
+        SettingSubmenu(TFT_eSPI* p_tft, Setting* menu_settings);
+};
+
 class SettingsMenu : public Menu {
     public: 
         SettingsMenu(TFT_eSPI* p_tft);
@@ -179,15 +192,8 @@ class SettingsMenu : public Menu {
         int8_t highlighted_setting = 0, previous_setting = 0xff;
         setting_menus_t current_menu = MAIN_SETTINGS_MENU;
         bool key_pressed = false, menu_up = false, menu_down = false;
+
+        Setting* current_setting = NULL;
+        SettingSubmenu* current_submenu = NULL;
         
 };
-
-// class Setting {
-//     public:
-//         Setting(String name, config_t setting_id, bool is_setting_word);
-// };
-
-// class SettingSubmenu {
-//     public: 
-//         SettingSubmenu(TFT_eSPI* p_tft, Setting* menu_settings);
-// };
