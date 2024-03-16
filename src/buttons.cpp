@@ -9,8 +9,9 @@
 #define UP_BUTTON       GPIO_NUM_17
 #define DOWN_BUTTON     GPIO_NUM_33
 
-#define DEBOUNCE_TIME_MS        50
-#define LONG_PRESS_TIME_MS      3000
+#define DEBOUNCE_TIME_MS            50
+#define LONG_PRESS_TIME_MS          3000
+#define CONSECUTIVE_ACTION_TIME_MS  500
 
 unsigned long enter_press_time, enter_release_time;
 unsigned long up_press_time, up_release_time;
@@ -38,36 +39,43 @@ void init_buttons(void) {
 
 
 void check_buttons(void) {
+    static unsigned long last_action_time = 0;
+    if (!up_pressed && !down_pressed && !enter_pressed && (millis() - last_action_time) < CONSECUTIVE_ACTION_TIME_MS) {return;}
+
     // Buttons are tied to a pull up resistor, therefore are pressed when the value is 0
+    if (enter_pressed || !digitalRead(ENTER_BUTTON)) {
+        enter_pressed = false;
+
+        if ((millis() - enter_press_time) >= LONG_PRESS_TIME_MS) {Serial.println("Enter button long press");}
+        else {Serial.println("Enter button short press");}
+    }
+
+    if ((up_pressed || !digitalRead(UP_BUTTON)) && (down_pressed || !digitalRead(DOWN_BUTTON))) {
+        up_pressed = false;
+        down_pressed = false;
+
+        if ((millis() - up_press_time) >= LONG_PRESS_TIME_MS && (millis() - down_press_time) >= LONG_PRESS_TIME_MS) {Serial.println("Dual button long press");} 
+        else {Serial.println("Dual button short press");}
+
+        goto end;
+    }
+
     if (up_pressed || !digitalRead(UP_BUTTON)) {
         up_pressed = false;
 
-        if ((millis() - up_press_time) >= LONG_PRESS_TIME_MS) {
-            Serial.println("Up button long press");
-        } else {
-            Serial.println("Up button short press");
-        }
+        if ((millis() - up_press_time) >= LONG_PRESS_TIME_MS) {Serial.println("Up button long press");} 
+        else {Serial.println("Up button short press");}
     }
 
     if (down_pressed || !digitalRead(DOWN_BUTTON)) {
         down_pressed = false;
 
-        if ((millis() - down_press_time) >= LONG_PRESS_TIME_MS) {
-            Serial.println("Down button long press");
-        } else {
-            Serial.println("Down button short press");
-        }
+        if ((millis() - down_press_time) >= LONG_PRESS_TIME_MS) {Serial.println("Down button long press");}
+        else {Serial.println("Down button short press");}
     }
 
-    if (enter_pressed || !digitalRead(ENTER_BUTTON)) {
-        enter_pressed = false;
-
-        if ((millis() - enter_press_time) >= LONG_PRESS_TIME_MS) {
-            Serial.println("Enter button long press");
-        } else {
-            Serial.println("Enter button short press");
-        }
-    }
+end:
+    last_action_time = millis();
 }
 
 
