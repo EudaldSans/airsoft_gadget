@@ -19,6 +19,8 @@ unsigned long down_press_time, down_release_time;
 
 bool enter_pressed, up_pressed, down_pressed;
 
+pButtonCallback_t enter_cb = NULL, up_cb = NULL, down_cb = NULL, dual_cb = NULL;
+
 
 void button_enter_ISR(void);
 void button_up_ISR(void);
@@ -38,6 +40,23 @@ void init_buttons(void) {
 }
 
 
+void register_enter_cb (pButtonCallback_t cb) {
+    enter_cb = cb;
+}
+
+void register_dual_cb (pButtonCallback_t cb) {
+    dual_cb = cb;
+}
+
+void register_up_cb (pButtonCallback_t cb) {
+    up_cb = cb;
+}
+
+void register_down_cb (pButtonCallback_t cb) {
+    down_cb = cb;
+}
+
+
 void check_buttons(void) {
     static unsigned long last_action_time = 0;
     if (!up_pressed && !down_pressed && !enter_pressed && (millis() - last_action_time) < CONSECUTIVE_ACTION_TIME_MS) {return;}
@@ -46,16 +65,16 @@ void check_buttons(void) {
     if (enter_pressed || !digitalRead(ENTER_BUTTON)) {
         enter_pressed = false;
 
-        if ((millis() - enter_press_time) >= LONG_PRESS_TIME_MS) {Serial.println("Enter button long press");}
-        else {Serial.println("Enter button short press");}
+        if (!enter_cb) {Serial.println("enter CB not registered!");}
+        else {enter_cb(millis() - enter_press_time);}
     }
 
     if ((up_pressed || !digitalRead(UP_BUTTON)) && (down_pressed || !digitalRead(DOWN_BUTTON))) {
         up_pressed = false;
         down_pressed = false;
 
-        if ((millis() - up_press_time) >= LONG_PRESS_TIME_MS && (millis() - down_press_time) >= LONG_PRESS_TIME_MS) {Serial.println("Dual button long press");} 
-        else {Serial.println("Dual button short press");}
+        if (!down_cb) {Serial.println("dual CB not registered!");}
+        else {down_cb(millis() - down_press_time);}
 
         goto end;
     }
@@ -63,15 +82,15 @@ void check_buttons(void) {
     if (up_pressed || !digitalRead(UP_BUTTON)) {
         up_pressed = false;
 
-        if ((millis() - up_press_time) >= LONG_PRESS_TIME_MS) {Serial.println("Up button long press");} 
-        else {Serial.println("Up button short press");}
+        if (!up_cb) {Serial.println("up CB not registered!");}
+        else {up_cb(millis() - down_press_time);}
     }
 
     if (down_pressed || !digitalRead(DOWN_BUTTON)) {
         down_pressed = false;
 
-        if ((millis() - down_press_time) >= LONG_PRESS_TIME_MS) {Serial.println("Down button long press");}
-        else {Serial.println("Down button short press");}
+        if (!down_cb) {Serial.println("down CB not registered!");}
+        else {down_cb(millis() - down_press_time);}
     }
 
 end:

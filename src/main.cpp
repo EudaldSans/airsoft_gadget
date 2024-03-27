@@ -60,6 +60,11 @@ uint8_t current_menu;
 void ir_sensr_0_ISR(void);
 void ir_sensr_1_ISR(void);
 
+void test_cb(unsigned long time) {
+    Serial.print("Test cb with time: ");
+    Serial.println(time);
+}
+
 /** 
  * @brief Setup function is called at the start of the program, sets up all peripherals and instantiates menus.
 */
@@ -69,6 +74,7 @@ void setup(void) {
     Serial.println("Start");
 
     init_buttons();
+    register_enter_cb(test_cb);
     return;
 
     // Setup all GPIOs
