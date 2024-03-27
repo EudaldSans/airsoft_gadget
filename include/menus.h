@@ -153,9 +153,17 @@ class ChronoMenu : public Menu {
 class Setting {
     public:
         // Setting(String name, config_t setting_id, bool is_setting_word);
-        Setting(String name, uint8_t setting_id, bool is_setting_word);
+        Setting(TFT_eSPI* p_tft, String name, uint8_t setting_id, bool is_setting_word);
 
         void update(bool init);
+
+    protected:
+        void up_button_press( void );
+        void down_button_press( void );
+        void center_button_press( void );
+
+        TFT_eSPI* _tft;
+        uint16_t small_font_height;
 };
 
 class SettingSubmenu {

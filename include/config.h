@@ -38,6 +38,7 @@ typedef enum {
 
 
 void init_config();
+void reset_configs_to_default();
 
 void update_config(config_t config, uint8_t value);
 void update_word_config(config_t config, uint16_t value);

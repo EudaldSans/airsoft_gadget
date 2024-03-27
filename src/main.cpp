@@ -26,9 +26,11 @@
 #include "I2Cdev.h"
 #include <HMC5883L.h>
 
-#include "TFT_eSPI.h"
-
 #include "menus.h"
+#include "screen.h"
+#include "BlackOpsOne28.h"
+#include "BlackOpsOne70.h"
+
 #include "EG_logo.h"
 
 #include "config.h"
@@ -46,14 +48,15 @@
 #define FLASH_UPDATE_PERIOD_MS  500
 
 
-TFT_eSPI tft = TFT_eSPI();
+// TFT_eSPI tft = TFT_eSPI();
 
 bool init_menu = true, inside_menu = false, go_to_sleep = false, cycle_uv = false;
 
 HMC5883L mag;
+TextBox *my_text_box;
 
-Menu* menus[NUMBER_OF_MENUS];
-Menu* menu_to_clear = NULL;
+// Menu* menus[NUMBER_OF_MENUS];
+// Menu* menu_to_clear = NULL;
 uint8_t current_menu;
 
 
@@ -63,6 +66,16 @@ void ir_sensr_1_ISR(void);
 void test_cb(unsigned long time) {
     Serial.print("Test cb with time: ");
     Serial.println(time);
+}
+
+void draw_loading_bar(uint8_t progress, uint16_t color) {
+    static uint8_t previous_progress = 30;
+
+    if (progress < previous_progress) {return;}
+    if (progress > ARC_END) {progress = ARC_END;} // Is this OK? Test it!
+
+    // tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, previous_progress, progress, color, TFT_BLACK);
+    previous_progress = progress;
 }
 
 /** 
@@ -75,7 +88,8 @@ void setup(void) {
 
     init_buttons();
     register_enter_cb(test_cb);
-    return;
+
+    init_config();
 
     // Setup all GPIOs
     pinMode(UV_ENABLE, OUTPUT);
@@ -87,16 +101,25 @@ void setup(void) {
     // Wait for a bit for all peripherals to boot up, could be lower
     delay(25);
 
+    init_screen();
+    my_text_box = new TextBox(SCREEN_CENTER, SCREEN_CENTER, "test", get_word_config(CFG_COLOR_0), BlackOpsOne70);
+
+    return;
+
+    
+
+    
+
     // Initialize flash storage and recover color config
-    init_config();
+    
     splash_screen_color = get_word_config(CFG_COLOR_2);
 
     // Initialize LCD scrreen, set correct rotation
-    tft.begin();
-    tft.setRotation(1);
-    tft.fillScreen(get_word_config(CFG_COLOR_BG));
-    tft.drawXBitmap(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_logo_bitmap, RTX_LOGO_W, RTX_LOGO_H, splash_screen_color);
-    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 30, 50, splash_screen_color, TFT_BLACK);
+    // tft.begin();
+    // tft.setRotation(1);
+    // tft.fillScreen(get_word_config(CFG_COLOR_BG));
+    // tft.drawXBitmap(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_logo_bitmap, RTX_LOGO_W, RTX_LOGO_H, splash_screen_color);
+    draw_loading_bar(50, splash_screen_color);
 
     Wire.setPins(18, 13);
     // Join I2C bus (I2Cdev library doesn't do this automatically)
@@ -111,10 +134,10 @@ void setup(void) {
     Serial.println(mag.testConnection() ? "HMC5883L connection successful" : "HMC5883L connection failed");
     
     // Prepare menus and set current menu to what is stored in flash
-    menus[AMMO_MENU]        = new AmmoMenu(&tft);
-    menus[KDR_MENU]         = new KDRMenu(&tft);
-    menus[CHRONO_MENU]      = new ChronoMenu(&tft);
-    menus[SETTINGS_MENU]    = new SettingsMenu(&tft);
+    // menus[AMMO_MENU]        = new AmmoMenu(&tft);
+    // menus[KDR_MENU]         = new KDRMenu(&tft);
+    // menus[CHRONO_MENU]      = new ChronoMenu(&tft);
+    // menus[SETTINGS_MENU]    = new SettingsMenu(&tft);
     current_menu = get_config(CFG_CURRENT_MENU);
 
     // Attatch all interrupts
@@ -122,22 +145,22 @@ void setup(void) {
     attachInterrupt(IR_SENSOR_1, ir_sensr_1_ISR, FALLING);
 
     // Draw a loading arc to make it look like we are doing some work while we show the logo
-    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 50, 70, splash_screen_color, TFT_BLACK);
+    draw_loading_bar(70, splash_screen_color);
     delay(100);
-    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 70, 90, splash_screen_color, TFT_BLACK);
+    draw_loading_bar(90, splash_screen_color);
     delay(150);
-    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 90, 100, splash_screen_color, TFT_BLACK);
+    draw_loading_bar(100, splash_screen_color);
     delay(50);
-    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 100, 150, splash_screen_color, TFT_BLACK);
+    draw_loading_bar(150, splash_screen_color);
     delay(250);
-    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 150, 175, splash_screen_color, TFT_BLACK);
+    draw_loading_bar(175, splash_screen_color);
     delay(100);
-    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 175, 225, splash_screen_color, TFT_BLACK);
+    draw_loading_bar(225, splash_screen_color);
     delay(300);
-    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, 225, ARC_END, splash_screen_color, TFT_BLACK);
+    draw_loading_bar(ARC_END, splash_screen_color);
     
     // Clear the loading screen
-    tft.fillScreen(get_word_config(CFG_COLOR_BG));
+    // tft.fillScreen(get_word_config(CFG_COLOR_BG));
 }
 
 /**
@@ -146,9 +169,35 @@ void setup(void) {
 void loop() {
     int16_t mx, my, mz;
     static unsigned long last_flash_update = 0;
+    
     unsigned long now = millis();
 
     check_buttons();
+
+    my_text_box->draw();
+    delay(1000);
+    my_text_box->clear();
+    delay(1000);
+    my_text_box->setColor(get_word_config(CFG_COLOR_0));
+    my_text_box->draw();
+    delay(1000);
+    my_text_box->setColor(get_word_config(CFG_COLOR_1));
+    my_text_box->draw();
+    delay(1000);
+    my_text_box->setColor(get_word_config(CFG_COLOR_2));
+    my_text_box->draw();
+    delay(1000);
+    my_text_box->setText("test1");
+    my_text_box->draw();
+    delay(1000);
+    my_text_box->setText("test2");
+    my_text_box->draw();
+    delay(1000);
+    my_text_box->setText("test3");
+    my_text_box->draw();
+    delay(1000);
+    my_text_box->clear();
+    delay(1000);
     return;
     
     // Read raw heading measurements from device
@@ -159,51 +208,51 @@ void loop() {
     if(heading < 0) heading += 2 * M_PI;
     heading = heading * 180/M_PI;
 
-    if (menu_to_clear != NULL) {
-        menu_to_clear->clear();
-        menu_to_clear = NULL;
-    }
+    // if (menu_to_clear != NULL) {
+    //     menu_to_clear->clear();
+    //     menu_to_clear = NULL;
+    // }
 
     // Update flash values if a new menu is being displayed
-    if (init_menu) {update_config(CFG_CURRENT_MENU, current_menu);}
+    // if (init_menu) {update_config(CFG_CURRENT_MENU, current_menu);}
 
-    // Update current menu
-    menus[current_menu]->update(heading, init_menu);
-    init_menu = false;
+    // // Update current menu
+    // menus[current_menu]->update(heading, init_menu);
+    // init_menu = false;
 
-    if (go_to_sleep) {
-        Serial.println("Going to sleep. zZz zZz zZz...");
+    // if (go_to_sleep) {
+    //     Serial.println("Going to sleep. zZz zZz zZz...");
 
-        save_all_configs();
+    //     save_all_configs();
 
-        // Turn off all peripherals
-        rtc_gpio_set_direction(PERIPHERAL_PSU, RTC_GPIO_MODE_OUTPUT_ONLY);
-        rtc_gpio_set_level(PERIPHERAL_PSU, 0);
+    //     // Turn off all peripherals
+    //     rtc_gpio_set_direction(PERIPHERAL_PSU, RTC_GPIO_MODE_OUTPUT_ONLY);
+    //     rtc_gpio_set_level(PERIPHERAL_PSU, 0);
 
-        // // Set enter button to wake up the device
-        // rtc_gpio_pullup_en(ENTER_BUTTON);
-        // esp_sleep_enable_ext0_wakeup(ENTER_BUTTON, 0);
+    //     // // Set enter button to wake up the device
+    //     // rtc_gpio_pullup_en(ENTER_BUTTON);
+    //     // esp_sleep_enable_ext0_wakeup(ENTER_BUTTON, 0);
 
-        // // Go to sleep
-        // esp_deep_sleep_start();
-    }
+    //     // // Go to sleep
+    //     // esp_deep_sleep_start();
+    // }
 
-    if ((now - last_flash_update) > FLASH_UPDATE_PERIOD_MS) {
-       save_all_configs();
-       last_flash_update = now; 
-       Serial.println("Updated all flash values");
-    }
+    // if ((now - last_flash_update) > FLASH_UPDATE_PERIOD_MS) {
+    //    save_all_configs();
+    //    last_flash_update = now; 
+    //    Serial.println("Updated all flash values");
+    // }
 
     // There is no need to stress the MCU, ~10fps are more than enough.
-    delay(100);
+    
 }
 
 /**
  * @brief Interrupt trigger by IR sensor 1. Informa @c AmmoMenu that a shot has been dected.
 */
 void IRAM_ATTR ir_sensr_0_ISR(void) {
-    AmmoMenu* ammo_menu = static_cast<AmmoMenu*>(menus[AMMO_MENU]);
-    if (ammo_menu != NULL) {ammo_menu->shot();}
+    // AmmoMenu* ammo_menu = static_cast<AmmoMenu*>(menus[AMMO_MENU]);
+    // if (ammo_menu != NULL) {ammo_menu->shot();}
 }
 
 /**
