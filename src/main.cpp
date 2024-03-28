@@ -54,6 +54,7 @@ bool init_menu = true, inside_menu = false, go_to_sleep = false, cycle_uv = fals
 
 HMC5883L mag;
 TextBox *my_text_box;
+Button *my_button;
 
 // Menu* menus[NUMBER_OF_MENUS];
 // Menu* menu_to_clear = NULL;
@@ -102,8 +103,8 @@ void setup(void) {
     delay(25);
 
     init_screen();
-    my_text_box = new TextBox(SCREEN_CENTER, SCREEN_CENTER, "test", get_word_config(CFG_COLOR_0), BlackOpsOne70);
-
+    my_text_box = new TextBox(SCREEN_CENTER, SCREEN_CENTER, "test", get_word_config(CFG_COLOR_0), BlackOpsOne28);
+    my_button = new Button(SCREEN_CENTER, SCREEN_CENTER, "test", get_word_config(CFG_COLOR_0), SCREEN_WIDTH - 10, 30);
     return;
 
     
@@ -174,29 +175,38 @@ void loop() {
 
     check_buttons();
 
-    my_text_box->draw();
+    my_button->draw(false);
     delay(1000);
-    my_text_box->clear();
+    my_button->clear();
     delay(1000);
-    my_text_box->setColor(get_word_config(CFG_COLOR_0));
-    my_text_box->draw();
+    my_button->draw(false);
     delay(1000);
-    my_text_box->setColor(get_word_config(CFG_COLOR_1));
-    my_text_box->draw();
+    my_button->invert();
     delay(1000);
-    my_text_box->setColor(get_word_config(CFG_COLOR_2));
-    my_text_box->draw();
+    my_button->invert();
     delay(1000);
-    my_text_box->setText("test1");
-    my_text_box->draw();
+    my_button->invert();
     delay(1000);
-    my_text_box->setText("test2");
-    my_text_box->draw();
+    my_button->setColor(get_word_config(CFG_COLOR_0));
+    my_button->draw(false);
     delay(1000);
-    my_text_box->setText("test3");
-    my_text_box->draw();
+    my_button->setColor(get_word_config(CFG_COLOR_1));
     delay(1000);
-    my_text_box->clear();
+    my_button->setColor(get_word_config(CFG_COLOR_2));
+    delay(1000);
+    my_button->setText("test1");
+    delay(1000);
+    my_button->setText("test2");
+    delay(1000);
+    my_button->setText("test3");
+    delay(1000);
+    my_button->setPosition(SCREEN_CENTER / 2, SCREEN_CENTER);
+    delay(1000);
+    my_button->setPosition(SCREEN_CENTER + SCREEN_CENTER / 2, SCREEN_CENTER);
+    delay(1000);
+    my_button->setPosition(SCREEN_CENTER, SCREEN_CENTER);
+    delay(1000);
+    my_button->clear();
     delay(1000);
     return;
     
