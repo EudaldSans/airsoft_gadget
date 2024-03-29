@@ -40,8 +40,42 @@ void clear_screen() {
 }
 
 
+Widget::Widget(int32_t pos_x, int32_t pos_y, uint16_t new_color) {
+    this->x = pos_x;
+    this->y = pos_y;
 
-TextBox::TextBox(int32_t pos_x, int32_t pos_y, String new_text, uint16_t new_color, const uint8_t* font){
+    this->color = new_color;
+    this->is_visible = false;
+}
+
+void Widget::draw(bool force) {log_e("Called generic Widget draw");}
+void Widget::clear() {log_e("Called generic Widget clear");}
+
+void Widget::setColor(uint16_t new_color) {
+    log_i("Widget color set to: %04X", new_color);
+    this->color = new_color;
+
+    if (this->is_visible){this->draw(true);}
+}
+
+void Widget::setPosition(int32_t pos_x, int32_t pos_y) {
+    bool was_visible = this->is_visible;
+
+    log_i("Widget position set to: (%d, %d)", pos_x, pos_y);
+    if (this->is_visible) {this->clear();}
+
+    this->x = pos_x;
+    this->y = pos_y;
+
+    if (was_visible) {this->draw(false);}
+}
+
+uint16_t Widget::getWidth( void ) {return this->width;;}
+uint16_t Widget::getHeight( void ) {return this->height;}
+
+
+
+TextBox::TextBox(int32_t pos_x, int32_t pos_y, String new_text, uint16_t new_color, const uint8_t* font) : Widget(pos_x, pos_y, new_color){
     log_i("Created new TextBox with text: %s, color: %04X and pos: (%d, %d)", new_text, new_color, pos_x, pos_y);
     
     tft.loadFont(font);
@@ -50,12 +84,8 @@ TextBox::TextBox(int32_t pos_x, int32_t pos_y, String new_text, uint16_t new_col
     if (this->width > SCREEN_WIDTH) {log_e("Text (%s) larger than SCREEN_WIDTH");}
     tft.unloadFont();
     
-    this->x = pos_x;
-    this->y = pos_y;
     this->text = new_text;
-    this->color = new_color;
     this->font = font;
-    this->is_visible = false;
 }
 
 void TextBox::draw(bool force) {
@@ -88,13 +118,6 @@ void TextBox::clear() {
     this->is_visible = false;
 }
 
-void TextBox::setColor(uint16_t new_color) {
-    log_i("TextBox (%s) color set to: %04X", this->text, new_color);
-    this->color = new_color;
-
-    if (this->is_visible){this->draw(true);}
-}
-
 void TextBox::setText(String new_text) {
     bool was_visible = this->is_visible;
 
@@ -107,21 +130,9 @@ void TextBox::setText(String new_text) {
     if (was_visible) {this->draw(false);}
 }
 
-void TextBox::setPosition(int32_t pos_x, int32_t pos_y) {
-    bool was_visible = this->is_visible;
-
-    log_i("TextBox (%s) position set to: (%d, %d)", this->text, pos_x, pos_y);
-    if (this->is_visible) {this->clear();}
-
-    this->x = pos_x;
-    this->y = pos_y;
-
-    if (was_visible) {this->draw(false);}
-}
 
 
-
-Button::Button(int32_t pos_x, int32_t pos_y, String new_text, uint16_t new_color, uint16_t width, uint16_t height) {
+Button::Button(int32_t pos_x, int32_t pos_y, String new_text, uint16_t new_color, uint16_t width, uint16_t height) : Widget(pos_x, pos_y, new_color) {
     log_i("Created new Button with text: %s, color: %04X and pos: (%d, %d)", new_text, new_color, pos_x, pos_y);
 
     if (width > SCREEN_WIDTH) {log_e("Button larger than SCREEN_WIDTH");}
@@ -130,15 +141,11 @@ Button::Button(int32_t pos_x, int32_t pos_y, String new_text, uint16_t new_color
     if (tft.textWidth(new_text) >= width) {log_e("Text (%s) larger than Button width %d", new_text, width);}
     if (small_font_height >= height) {log_e("Text (%s) larger than Button height %d", new_text, height);}
 
-    this->x = pos_x;
-    this->y = pos_y;
     this->text = new_text;
-    this->color = new_color;
-    this->is_visible = false;
     this->inverted = false;
     this->width = width;
     this->height = height;
-};
+}
 
 void Button::draw(bool force) {
     if (this->is_visible && !force) {return;}
@@ -167,7 +174,7 @@ void Button::draw(bool force) {
     }
 
     this->is_visible = true;
-};
+}
 
 void Button::invert() {
     log_i("Inverting Button %s", this->text);
@@ -180,14 +187,14 @@ void Button::invert() {
 
     this->inverted = !this->inverted;
     this->draw(true);
-};
+}
 
 void Button::clear() {
     if (!this->is_visible) {return;}
     log_i("Clearing Button %s", this->text);
     tft.fillRect(this->x - this->width/2, this->y - this->height/2, this->width, this->height, get_word_config(CFG_COLOR_BG));
     this->is_visible = false;
-};
+}
 
 void Button::setText(String new_text) {
     bool was_visible = this->is_visible;
@@ -200,40 +207,53 @@ void Button::setText(String new_text) {
 
     if (was_visible) {this->draw(false);}
 
-};
-
-void Button::setColor(uint16_t new_color) {
-    log_i("Button (%s) color set to: %04X", this->text, new_color);
-    this->color = new_color;
-
-    if (this->is_visible){this->draw(true);}
-};
-
-void Button::setPosition(int32_t pos_x, int32_t pos_y) {
-    bool was_visible = this->is_visible;
-
-    log_i("Button (%s) position set to: (%d, %d)", this->text, pos_x, pos_y);
-    if (this->is_visible) {this->clear();}
-
-    this->x = pos_x;
-    this->y = pos_y;
-
-    if (was_visible) {this->draw(false);}
-}; 
+}
 
 
-Meter::Meter(int32_t pos_x, int32_t pos_y, int32_t pos_w, int32_t pos_h, uint16_t new_color, uint8_t new_level) {
+Meter::Meter(int32_t pos_x, int32_t pos_y, int32_t width, int32_t height, uint16_t new_color, uint8_t start_level) : Widget(pos_x, pos_y, new_color) {
+    if (width > SCREEN_WIDTH) {log_e("Meter larger than SCREEN_WIDTH");}
+    if (height > SCREEN_HEIGHT) {log_e("Meter larger than SCREEN_HEIGHT");}
 
+    this->width = width;
+    this->height = height;
+    this->level = start_level;
 }
 
 void Meter::draw(bool force) {
+    if (this->is_visible && !force) {return;}
+    log_i("Drawing Meter");
 
-};
+    uint8_t meter_fill = (this->width - 4) * this->level / 100;
+
+    tft.drawRect(this->x - this->width/2, this->y - this->height/2, this->width, this->height, this->color);
+    tft.fillRect(this->x - this->width/2 + 2, this->y - this->height/2 + 2, meter_fill, this->height - 4, this->color);
+
+    this->is_visible = true;
+}
+
+void Meter::clear() {
+    if (!this->is_visible) {return;}
+    log_i("Drawing Meter");
+
+    uint8_t bar_width = (this->width - 4) * this->level / 100;
+
+    tft.fillRect(this->x - this->width/2, this->y - this->height/2, this->width, this->height, get_word_config(CFG_COLOR_BG));
+    // tft.fillRect(this->x - this->width/2 + 2, this->y - this->height/2 + 2, bar_width, this->height - 4, get_word_config(CFG_COLOR_BG));
+
+    this->is_visible = false;
+}
 
 void Meter::updateLevel(uint8_t new_level) {
+    if (!this->is_visible) {this->level = new_level; return;}
 
-};
+    uint8_t previous_bar_width = (this->width - 4) * this->level / 100;
+    uint8_t new_bar_width = (this->width - 4) * this->level / 100;
 
-void Meter::updateColor(uint16_t new_color) {
-    
-};
+    if (previous_bar_width == new_bar_width) {return;}
+    else if (previous_bar_width > new_bar_width) {
+        tft.fillRect(this->x - this->width/2 + 2 + new_bar_width, this->y - this->height/2 + 2, previous_bar_width - new_bar_width, this->height - 4, get_word_config(CFG_COLOR_BG));
+    } else {
+        tft.fillRect(this->x - this->width/2 + 2 + previous_bar_width, this->y - this->height/2 + 2, new_bar_width - previous_bar_width, this->height - 4, this->color);
+    }
+}
+
