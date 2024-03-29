@@ -221,3 +221,19 @@ void Button::setPosition(int32_t pos_x, int32_t pos_y) {
     if (was_visible) {this->draw(false);}
 }; 
 
+
+Meter::Meter(int32_t pos_x, int32_t pos_y, int32_t pos_w, int32_t pos_h, uint16_t new_color, uint8_t new_level) {
+
+}
+
+void Meter::draw(bool force) {
+
+};
+
+void Meter::updateLevel(uint8_t new_level) {
+
+};
+
+void Meter::updateColor(uint16_t new_color) {
+    
+};

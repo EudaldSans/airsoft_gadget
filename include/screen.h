@@ -70,10 +70,11 @@ class Meter {
 
         uint16_t width, height;
     
-    protected:
+    private:
         int32_t x, y, w, h;
         uint16_t color;
         uint8_t level;
+        bool is_visible;
 };
 
 
