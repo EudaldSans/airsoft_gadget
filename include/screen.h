@@ -87,7 +87,7 @@ class Meter : public Widget {
         void draw(bool force);
         void clear();
 
-        void updateLevel(uint8_t new_level);
+        void setLevel(uint8_t new_level);
     
     private:
         uint8_t level;

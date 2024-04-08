@@ -85,3 +85,58 @@ void BoolSetting::pressed_center(unsigned long press_time_ms) {
     update_config(this->config_id, config_write_value);
     this->deactivate();
 }
+
+
+/******************/
+/* SLIDER SETTING */
+/******************/
+
+SliderSetting::SliderSetting(config_t config_id, String title, uint16_t level,  uint16_t max_level, uint16_t min_level) : Setting(config_id, title) {
+    this->setting_meter = new Meter(5, SCREEN_CENTER, SCREEN_WIDTH - 10, 20, get_word_config(CFG_COLOR_0), level);
+
+    this->currrent_level = level;
+    this->max_level = max_level;
+    this->min_level = min_level;
+
+    this->meter_updated = false;
+}
+
+void SliderSetting::update(bool force) {
+    static uint16_t previous_level = 0;
+    log_i("Updating SliderSetting with id %d, force=%d", this->config_id, force);
+
+    this->title->draw(force);
+    this->setting_meter->draw(force);
+
+    if (previous_level != this->currrent_level) {
+        this->setting_meter->setLevel(this->currrent_level);
+        previous_level = this->currrent_level;
+    } 
+}
+
+void SliderSetting::clear( void ) {
+    log_i("Clearing SliderSetting with id %d", this->config_id);
+    this->title->clear();
+    this->setting_meter->clear();
+}
+
+void SliderSetting::pressed_up(unsigned long press_time_ms) {
+    if (this->currrent_level >= this->max_level) {return;}
+    if (press_time_ms == 0) {this->currrent_level++;}
+    
+    if (press_time_ms >= LONG_PRESS_TIME_MS) {this->currrent_level++;}
+}
+
+void SliderSetting::pressed_down(unsigned long press_time_ms) {
+    if (this->currrent_level <= this->min_level) {return;}
+    if (press_time_ms == 0) {this->currrent_level--;}
+    
+    if (press_time_ms >= LONG_PRESS_TIME_MS) {this->currrent_level--;}
+}
+
+// FIXME: probably should be calling callbacks to tell the parent when it's finished?
+void SliderSetting::pressed_center(unsigned long press_time_ms) {
+    update_word_config(this->config_id, this->currrent_level);
+    this->deactivate();
+}
+

@@ -311,7 +311,7 @@ void Meter::clear() {
     this->is_visible = false;
 }
 
-void Meter::updateLevel(uint8_t new_level) {
+void Meter::setLevel(uint8_t new_level) {
     if (!this->is_visible) {this->level = new_level; return;}
 
     uint8_t previous_bar_width = (this->width - 4) * this->level / 100;
@@ -323,6 +323,8 @@ void Meter::updateLevel(uint8_t new_level) {
     } else {
         tft.fillRect(this->x - this->width/2 + 2 + previous_bar_width, this->y - this->height/2 + 2, new_bar_width - previous_bar_width, this->height - 4, this->color);
     }
+
+    this->level = new_level;
 }
 
 

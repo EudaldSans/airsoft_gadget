@@ -150,58 +150,42 @@ class ChronoMenu : public Menu {
         String title = "Chrono";
 };
 
-class Setting {
-    public:
-        // Setting(String name, config_t setting_id, bool is_setting_word);
-        Setting(TFT_eSPI* p_tft, String name, uint8_t setting_id, bool is_setting_word);
+// class SettingSubmenu {
+//     public: 
+//         SettingSubmenu(TFT_eSPI* p_tft, Setting* menu_settings);
+// };
 
-        void update(bool init);
+// class SettingsMenu : public Menu {
+//     public: 
+//         SettingsMenu(TFT_eSPI* p_tft);
 
-    protected:
-        void up_button_press( void );
-        void down_button_press( void );
-        void center_button_press( void );
+//         void update(float heading, bool init);
 
-        TFT_eSPI* _tft;
-        uint16_t small_font_height;
-};
+//         bool enter_button(unsigned long press_duration);
+//         void up_button(unsigned long press_duration);
+//         void down_button(unsigned long press_duration);
 
-class SettingSubmenu {
-    public: 
-        SettingSubmenu(TFT_eSPI* p_tft, Setting* menu_settings);
-};
+//         void clear();
 
-class SettingsMenu : public Menu {
-    public: 
-        SettingsMenu(TFT_eSPI* p_tft);
+//     private:
+//         void drawSliderSetting(uint16_t min, uint16_t max, uint16_t pos);
+//         void drawColorSetting(uint32_t current_color);
+//         void drawStringSetting(bool draw_left, bool draw_right, String current_text);
+//         void drawYesNoSetting(bool highlighted_setting);
 
-        void update(float heading, bool init);
+//         void drawMenu(uint8_t highlighted_setting, String* setting_names, uint8_t max_settings, bool init);
 
-        bool enter_button(unsigned long press_duration);
-        void up_button(unsigned long press_duration);
-        void down_button(unsigned long press_duration);
+//         void main_settings_key_press();
+//         void ammo_settings_key_press();
+//         void chrono_settings_key_press();
+//         void kdr_settings_key_press();
+//         void color_settings_key_press();
 
-        void clear();
+//         int8_t highlighted_setting = 0, previous_setting = 0xff;
+//         setting_menus_t current_menu = MAIN_SETTINGS_MENU;
+//         bool key_pressed = false, menu_up = false, menu_down = false;
 
-    private:
-        void drawSliderSetting(uint16_t min, uint16_t max, uint16_t pos);
-        void drawColorSetting(uint32_t current_color);
-        void drawStringSetting(bool draw_left, bool draw_right, String current_text);
-        void drawYesNoSetting(bool highlighted_setting);
-
-        void drawMenu(uint8_t highlighted_setting, String* setting_names, uint8_t max_settings, bool init);
-
-        void main_settings_key_press();
-        void ammo_settings_key_press();
-        void chrono_settings_key_press();
-        void kdr_settings_key_press();
-        void color_settings_key_press();
-
-        int8_t highlighted_setting = 0, previous_setting = 0xff;
-        setting_menus_t current_menu = MAIN_SETTINGS_MENU;
-        bool key_pressed = false, menu_up = false, menu_down = false;
-
-        Setting* current_setting = NULL;
-        SettingSubmenu* current_submenu = NULL;
+//         Setting* current_setting = NULL;
+//         SettingSubmenu* current_submenu = NULL;
         
-};
+// };
