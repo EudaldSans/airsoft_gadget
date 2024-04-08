@@ -72,7 +72,8 @@ void Widget::setPosition(int32_t pos_x, int32_t pos_y) {
 
 uint16_t Widget::getWidth( void ) {return this->width;;}
 uint16_t Widget::getHeight( void ) {return this->height;}
-
+uint32_t Widget::getX( void ) {return this->x;}
+uint32_t Widget::getY( void ) {return this->y;}
 
 
 TextBox::TextBox(int32_t pos_x, int32_t pos_y, String new_text, uint16_t new_color, const uint8_t* font) : Widget(pos_x, pos_y, new_color){

@@ -29,6 +29,8 @@ class Widget {
 
         uint16_t getWidth( void );
         uint16_t getHeight( void );
+        uint32_t getX( void );
+        uint32_t getY( void );
 
     protected:
         uint16_t width, height;
