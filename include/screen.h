@@ -16,6 +16,7 @@
 
 void init_screen();
 void clear_screen();
+void draw_loading_bar(uint16_t progress, uint16_t color);
 
 class Widget {
     public:
@@ -83,5 +84,13 @@ class Meter : public Widget {
 };
 
 
-// TODO: class Image
+class Image : public Widget {
+    public: 
+        Image(int32_t pos_x, int32_t pos_y, int16_t image_width, int16_t image_height, uint16_t new_color, const uint8_t* image_bmp);
 
+        void draw(bool force);
+        void clear();
+
+    private:
+        const uint8_t* image;
+};

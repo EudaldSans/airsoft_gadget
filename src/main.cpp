@@ -55,6 +55,8 @@ bool init_menu = true, inside_menu = false, go_to_sleep = false, cycle_uv = fals
 HMC5883L mag;
 TextBox *my_text_box;
 Button *my_button;
+Image *my_image;
+Meter *my_meter;
 
 // Menu* menus[NUMBER_OF_MENUS];
 // Menu* menu_to_clear = NULL;
@@ -69,16 +71,6 @@ void test_cb(unsigned long time) {
     Serial.println(time);
 }
 
-void draw_loading_bar(uint8_t progress, uint16_t color) {
-    static uint8_t previous_progress = 30;
-
-    if (progress < previous_progress) {return;}
-    if (progress > ARC_END) {progress = ARC_END;} // Is this OK? Test it!
-
-    // tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, previous_progress, progress, color, TFT_BLACK);
-    previous_progress = progress;
-}
-
 /** 
  * @brief Setup function is called at the start of the program, sets up all peripherals and instantiates menus.
 */
@@ -86,6 +78,8 @@ void setup(void) {
     uint32_t splash_screen_color;
     Serial.begin(115200);
     Serial.println("Start");
+
+    Image logo = Image(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_LOGO_W, RTX_LOGO_H, splash_screen_color, RTX_logo_bitmap);
 
     init_buttons();
     register_enter_cb(test_cb);
@@ -105,6 +99,8 @@ void setup(void) {
     init_screen();
     my_text_box = new TextBox(SCREEN_CENTER, SCREEN_CENTER, "test", get_word_config(CFG_COLOR_0), BlackOpsOne28);
     my_button = new Button(SCREEN_CENTER, SCREEN_CENTER, "test", get_word_config(CFG_COLOR_0), SCREEN_WIDTH - 10, 30);
+    my_image = new Image(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_LOGO_W, RTX_LOGO_H, splash_screen_color, RTX_logo_bitmap);
+    my_meter = new Meter(SCREEN_CENTER, SCREEN_CENTER, SCREEN_WIDTH - 10, 20, get_word_config(CFG_COLOR_0), 50);
     return;
 
     
@@ -161,7 +157,7 @@ void setup(void) {
     draw_loading_bar(ARC_END, splash_screen_color);
     
     // Clear the loading screen
-    // tft.fillScreen(get_word_config(CFG_COLOR_BG));
+    clear_screen();
 }
 
 /**
@@ -175,38 +171,37 @@ void loop() {
 
     check_buttons();
 
-    my_button->draw(false);
+    my_meter->draw(false);
     delay(1000);
-    my_button->clear();
+    my_meter->clear();
     delay(1000);
-    my_button->draw(false);
+    my_meter->draw(false);
     delay(1000);
-    my_button->invert();
+    my_meter->updateLevel(75);
     delay(1000);
-    my_button->invert();
+    my_meter->updateLevel(100);
     delay(1000);
-    my_button->invert();
+    my_meter->updateLevel(40);
     delay(1000);
-    my_button->setColor(get_word_config(CFG_COLOR_0));
-    my_button->draw(false);
+    my_meter->setColor(get_word_config(CFG_COLOR_0));
     delay(1000);
-    my_button->setColor(get_word_config(CFG_COLOR_1));
+    my_meter->setColor(get_word_config(CFG_COLOR_1));
     delay(1000);
-    my_button->setColor(get_word_config(CFG_COLOR_2));
+    my_meter->setColor(get_word_config(CFG_COLOR_2));
     delay(1000);
-    my_button->setText("test1");
+    my_meter->updateLevel(25);
     delay(1000);
-    my_button->setText("test2");
+    my_meter->updateLevel(0);
     delay(1000);
-    my_button->setText("test3");
+    my_meter->updateLevel(50);
     delay(1000);
-    my_button->setPosition(SCREEN_CENTER / 2, SCREEN_CENTER);
+    my_meter->setPosition(SCREEN_CENTER / 2, SCREEN_CENTER);
     delay(1000);
-    my_button->setPosition(SCREEN_CENTER + SCREEN_CENTER / 2, SCREEN_CENTER);
+    my_meter->setPosition(SCREEN_CENTER + SCREEN_CENTER / 2, SCREEN_CENTER);
     delay(1000);
-    my_button->setPosition(SCREEN_CENTER, SCREEN_CENTER);
+    my_meter->setPosition(SCREEN_CENTER, SCREEN_CENTER);
     delay(1000);
-    my_button->clear();
+    my_meter->clear();
     delay(1000);
     return;
     

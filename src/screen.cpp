@@ -39,6 +39,16 @@ void clear_screen() {
     tft.fillScreen(get_word_config(CFG_COLOR_BG));
 }
 
+void draw_loading_bar(uint16_t progress, uint16_t color) {
+    static uint16_t previous_progress = 30;
+
+    if (progress < previous_progress) {return;}
+    if (progress > ARC_END) {progress = ARC_END;} // Is this OK? Test it!
+
+    tft.drawArc(SCREEN_CENTER, SCREEN_CENTER, ARC_RADIOUS, ARC_RADIOUS - 10, previous_progress, progress, color, TFT_BLACK);
+    previous_progress = progress;
+}
+
 
 Widget::Widget(int32_t pos_x, int32_t pos_y, uint16_t new_color) {
     this->x = pos_x;
@@ -258,3 +268,27 @@ void Meter::updateLevel(uint8_t new_level) {
     }
 }
 
+// tft.drawXBitmap(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_logo_bitmap, RTX_LOGO_W, RTX_LOGO_H, splash_screen_color);
+
+Image::Image(int32_t pos_x, int32_t pos_y, int16_t image_width, int16_t image_height, uint16_t new_color, const uint8_t* image_bmp) : Widget(pos_x, pos_y, new_color) {
+    this->x = pos_x;
+    this->y = pos_y;
+    this->width = image_width;
+    this->height = image_height;
+    this->image = image_bmp;
+    this->color = new_color;
+}
+
+void Image::draw(bool force) {
+    if (this->is_visible && !force) {return;}
+    log_i("Drawing Image");
+
+    tft.drawXBitmap(this->x, this->y, this->image, this->width, this->height, this->color);
+}
+
+void Image::clear() {
+    if (!this->is_visible) {return;}
+    log_i("Clearing Image");
+
+    tft.drawXBitmap(this->x, this->y, this->image, this->width, this->height, get_word_config(CFG_COLOR_BG));
+}
