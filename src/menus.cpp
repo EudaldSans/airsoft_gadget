@@ -7,10 +7,6 @@
 #include <iomanip>
 #include <sstream>
 
-// The font names are arrays references, thus must NOT be in quotes ""
-#define FONT_75p BlackOpsOne75
-#define FONT_28p BlackOpsOne28
-
 #define SCREEN_CENTER      120
 #define ARC_RADIOUS     120
 #define ARC_START       30
