@@ -18,10 +18,10 @@
 TFT_eSPI tft = TFT_eSPI();
 uint16_t small_font_height, large_font_height;
 
-void init_screen() {
+void screen_init() {
     tft.begin();
     tft.setRotation(1);
-    clear_screen();
+    screen_clear();
 
     tft.loadFont(BlackOpsOne28);
     small_font_height = tft.fontHeight();
@@ -35,11 +35,11 @@ void init_screen() {
     log_i("Small font height: %d", small_font_height);
 }
 
-void clear_screen() {
+void screen_clear() {
     tft.fillScreen(get_word_config(CFG_COLOR_BG));
 }
 
-void draw_loading_bar(uint16_t progress, uint16_t color) {
+void screen_draw_loading_bar(uint16_t progress, uint16_t color) {
     static uint16_t previous_progress = 30;
 
     if (progress < previous_progress) {return;}
@@ -49,7 +49,7 @@ void draw_loading_bar(uint16_t progress, uint16_t color) {
     previous_progress = progress;
 }
 
-uint16_t get_small_text_width(String text) {
+uint16_t screen_get_small_text_width(String text) {
     uint16_t text_width;
     
     tft.loadFont(BlackOpsOne28);
@@ -59,7 +59,7 @@ uint16_t get_small_text_width(String text) {
     return text_width;
 }
 
-uint16_t get_large_text_width(String text) {
+uint16_t screen_get_large_text_width(String text) {
     uint16_t text_width;
     
     tft.loadFont(BlackOpsOne75);
@@ -69,11 +69,11 @@ uint16_t get_large_text_width(String text) {
     return text_width;
 }
 
-uint16_t get_small_text_height() {
+uint16_t screen_get_small_text_height() {
     return small_font_height;
 }
 
-uint8_t get_large_text_height() {
+uint8_t screen_get_large_text_height() {
     return large_font_height;
 }
 

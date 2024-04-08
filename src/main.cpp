@@ -96,7 +96,7 @@ void setup(void) {
     // Wait for a bit for all peripherals to boot up, could be lower
     delay(25);
 
-    init_screen();
+    screen_init();
     my_text_box = new TextBox(SCREEN_CENTER, SCREEN_CENTER, "test", get_word_config(CFG_COLOR_0), BlackOpsOne28);
     my_button = new Button(SCREEN_CENTER, SCREEN_CENTER, "test", get_word_config(CFG_COLOR_0), SCREEN_WIDTH - 10, 30);
     my_image = new Image(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_LOGO_W, RTX_LOGO_H, splash_screen_color, RTX_logo_bitmap);
@@ -116,7 +116,7 @@ void setup(void) {
     // tft.setRotation(1);
     // tft.fillScreen(get_word_config(CFG_COLOR_BG));
     // tft.drawXBitmap(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_logo_bitmap, RTX_LOGO_W, RTX_LOGO_H, splash_screen_color);
-    draw_loading_bar(50, splash_screen_color);
+    screen_draw_loading_bar(50, splash_screen_color);
 
     Wire.setPins(18, 13);
     // Join I2C bus (I2Cdev library doesn't do this automatically)
@@ -142,22 +142,22 @@ void setup(void) {
     attachInterrupt(IR_SENSOR_1, ir_sensr_1_ISR, FALLING);
 
     // Draw a loading arc to make it look like we are doing some work while we show the logo
-    draw_loading_bar(70, splash_screen_color);
+    screen_draw_loading_bar(70, splash_screen_color);
     delay(100);
-    draw_loading_bar(90, splash_screen_color);
+    screen_draw_loading_bar(90, splash_screen_color);
     delay(150);
-    draw_loading_bar(100, splash_screen_color);
+    screen_draw_loading_bar(100, splash_screen_color);
     delay(50);
-    draw_loading_bar(150, splash_screen_color);
+    screen_draw_loading_bar(150, splash_screen_color);
     delay(250);
-    draw_loading_bar(175, splash_screen_color);
+    screen_draw_loading_bar(175, splash_screen_color);
     delay(100);
-    draw_loading_bar(225, splash_screen_color);
+    screen_draw_loading_bar(225, splash_screen_color);
     delay(300);
-    draw_loading_bar(ARC_END, splash_screen_color);
+    screen_draw_loading_bar(ARC_END, splash_screen_color);
     
     // Clear the loading screen
-    clear_screen();
+    screen_clear();
 }
 
 /**

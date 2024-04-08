@@ -14,15 +14,15 @@
 #define SMALL_FONT_HEIGHT   27
 
 
-void init_screen();
-void clear_screen();
+void screen_init();
+void screen_clear();
 
-void draw_loading_bar(uint16_t progress, uint16_t color);
+void screen_draw_loading_bar(uint16_t progress, uint16_t color);
 
-uint16_t get_small_text_width(String text);
-uint16_t get_large_text_width(String text);
-uint16_t get_small_text_height();
-uint8_t get_large_text_height();
+uint16_t screen_get_small_text_width(String text);
+uint16_t screen_get_large_text_width(String text);
+uint16_t screen_get_small_text_height();
+uint8_t screen_get_large_text_height();
 
 class Widget {
     public:
