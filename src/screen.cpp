@@ -49,6 +49,33 @@ void draw_loading_bar(uint16_t progress, uint16_t color) {
     previous_progress = progress;
 }
 
+uint16_t get_small_text_width(String text) {
+    uint16_t text_width;
+    
+    tft.loadFont(BlackOpsOne28);
+    text_width = tft.textWidth(text);
+    tft.unloadFont(); 
+
+    return text_width;
+}
+
+uint16_t get_large_text_width(String text) {
+    uint16_t text_width;
+    
+    tft.loadFont(BlackOpsOne75);
+    text_width = tft.textWidth(text);
+    tft.unloadFont(); 
+
+    return text_width;
+}
+
+uint16_t get_small_text_height() {
+    return small_font_height;
+}
+
+uint8_t get_large_text_height() {
+    return large_font_height;
+}
 
 /****************/
 /* WIDGET CLASS */

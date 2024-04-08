@@ -16,7 +16,13 @@
 
 void init_screen();
 void clear_screen();
+
 void draw_loading_bar(uint16_t progress, uint16_t color);
+
+uint16_t get_small_text_width(String text);
+uint16_t get_large_text_width(String text);
+uint16_t get_small_text_height();
+uint8_t get_large_text_height();
 
 class Widget {
     public:
