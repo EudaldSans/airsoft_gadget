@@ -50,6 +50,10 @@ void draw_loading_bar(uint16_t progress, uint16_t color) {
 }
 
 
+/****************/
+/* WIDGET CLASS */
+/****************/
+
 Widget::Widget(int32_t pos_x, int32_t pos_y, uint16_t new_color) {
     this->x = pos_x;
     this->y = pos_y;
@@ -85,6 +89,10 @@ uint16_t Widget::getHeight( void ) {return this->height;}
 uint32_t Widget::getX( void ) {return this->x;}
 uint32_t Widget::getY( void ) {return this->y;}
 
+
+/******************/
+/* TEXT BOX CLASS */
+/******************/
 
 TextBox::TextBox(int32_t pos_x, int32_t pos_y, String new_text, uint16_t new_color, const uint8_t* font) : Widget(pos_x, pos_y, new_color){
     log_i("Created new TextBox with text: %s, color: %04X and pos: (%d, %d)", new_text, new_color, pos_x, pos_y);
@@ -142,6 +150,9 @@ void TextBox::setText(String new_text) {
 }
 
 
+/****************/
+/* BUTTON CLASS */
+/****************/
 
 Button::Button(int32_t pos_x, int32_t pos_y, String new_text, uint16_t new_color, uint16_t width, uint16_t height) : Widget(pos_x, pos_y, new_color) {
     log_i("Created new Button with text: %s, color: %04X and pos: (%d, %d)", new_text, new_color, pos_x, pos_y);
@@ -221,6 +232,10 @@ void Button::setText(String new_text) {
 }
 
 
+/***************/
+/* METER CLASS */
+/***************/
+
 Meter::Meter(int32_t pos_x, int32_t pos_y, int32_t width, int32_t height, uint16_t new_color, uint8_t start_level) : Widget(pos_x, pos_y, new_color) {
     if (width > SCREEN_WIDTH) {log_e("Meter larger than SCREEN_WIDTH");}
     if (height > SCREEN_HEIGHT) {log_e("Meter larger than SCREEN_HEIGHT");}
@@ -268,7 +283,10 @@ void Meter::updateLevel(uint8_t new_level) {
     }
 }
 
-// tft.drawXBitmap(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_logo_bitmap, RTX_LOGO_W, RTX_LOGO_H, splash_screen_color);
+
+/***************/
+/* IMAGE CLASS */
+/***************/
 
 Image::Image(int32_t pos_x, int32_t pos_y, int16_t image_width, int16_t image_height, uint16_t new_color, const uint8_t* image_bmp) : Widget(pos_x, pos_y, new_color) {
     this->x = pos_x;
