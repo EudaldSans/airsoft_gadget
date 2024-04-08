@@ -66,14 +66,18 @@ class Button : public Widget {
         Button(int32_t pos_x, int32_t pos_y, String new_text, uint16_t new_color, uint16_t width, uint16_t height);
         
         void draw(bool force);
-        void invert();
         void clear();
+
+        void select();
+        void desselect();        
 
         void setText(String new_text);
     
     private:
+        void invert();
+
         String text;
-        bool inverted;
+        bool inverted, selected;
 };
 
 class Meter : public Widget {

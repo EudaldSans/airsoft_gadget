@@ -10,7 +10,6 @@
 #define DOWN_BUTTON     GPIO_NUM_33
 
 #define DEBOUNCE_TIME_MS            50
-#define LONG_PRESS_TIME_MS          3000
 #define CONSECUTIVE_ACTION_TIME_MS  500
 
 unsigned long enter_press_time, enter_release_time;

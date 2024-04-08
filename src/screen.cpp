@@ -192,6 +192,7 @@ Button::Button(int32_t pos_x, int32_t pos_y, String new_text, uint16_t new_color
 
     this->text = new_text;
     this->inverted = false;
+    this->selected = false;
     this->width = width;
     this->height = height;
 }
@@ -236,6 +237,20 @@ void Button::invert() {
 
     this->inverted = !this->inverted;
     this->draw(true);
+}
+
+void Button::select() { 
+    if (this->selected) {return;}
+
+    this->invert();
+    this->selected = true;
+}
+
+void Button::desselect() {
+    if (!this->selected) {return;}
+
+    this->invert();
+    this->selected = false;
 }
 
 void Button::clear() {

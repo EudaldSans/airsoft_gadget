@@ -1,6 +1,8 @@
 #pragma once
 
-typedef void (*pButtonCallback_t) (unsigned long press_time);
+#define LONG_PRESS_TIME_MS          1500
+
+typedef void (*pButtonCallback_t) (unsigned long press_time_ms);
 
 void init_buttons(void);
 void check_buttons(void);
