@@ -99,7 +99,7 @@ void setup(void) {
     screen_init();
     my_text_box = new TextBox(SCREEN_CENTER, SCREEN_CENTER, "test", get_word_config(CFG_COLOR_0), BlackOpsOne28);
     my_button = new Button(SCREEN_CENTER, SCREEN_CENTER, "test", get_word_config(CFG_COLOR_0), SCREEN_WIDTH - 10, 30);
-    my_image = new Image(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_LOGO_W, RTX_LOGO_H, splash_screen_color, RTX_logo_bitmap);
+    my_image = new Image(SCREEN_CENTER, SCREEN_CENTER, RTX_LOGO_W, RTX_LOGO_H, get_word_config(CFG_COLOR_0), RTX_logo_bitmap);
     my_meter = new Meter(SCREEN_CENTER, SCREEN_CENTER, SCREEN_WIDTH - 10, 20, get_word_config(CFG_COLOR_0), 50);
     return;
 
@@ -171,37 +171,25 @@ void loop() {
 
     check_buttons();
 
-    my_meter->draw(false);
+    my_image->draw(false);
     delay(1000);
-    my_meter->clear();
+    my_image->clear();
     delay(1000);
-    my_meter->draw(false);
+    my_image->draw(false);
     delay(1000);
-    my_meter->setLevel(75);
+    my_image->setColor(get_word_config(CFG_COLOR_0));
     delay(1000);
-    my_meter->setLevel(100);
+    my_image->setColor(get_word_config(CFG_COLOR_1));
     delay(1000);
-    my_meter->setLevel(40);
+    my_image->setColor(get_word_config(CFG_COLOR_2));
     delay(1000);
-    my_meter->setColor(get_word_config(CFG_COLOR_0));
+    my_image->setPosition(SCREEN_CENTER / 2, SCREEN_CENTER);
     delay(1000);
-    my_meter->setColor(get_word_config(CFG_COLOR_1));
+    my_image->setPosition(SCREEN_CENTER + SCREEN_CENTER / 2, SCREEN_CENTER);
     delay(1000);
-    my_meter->setColor(get_word_config(CFG_COLOR_2));
+    my_image->setPosition(SCREEN_CENTER, SCREEN_CENTER);
     delay(1000);
-    my_meter->setLevel(25);
-    delay(1000);
-    my_meter->setLevel(0);
-    delay(1000);
-    my_meter->setLevel(50);
-    delay(1000);
-    my_meter->setPosition(SCREEN_CENTER / 2, SCREEN_CENTER);
-    delay(1000);
-    my_meter->setPosition(SCREEN_CENTER + SCREEN_CENTER / 2, SCREEN_CENTER);
-    delay(1000);
-    my_meter->setPosition(SCREEN_CENTER, SCREEN_CENTER);
-    delay(1000);
-    my_meter->clear();
+    my_image->clear();
     delay(1000);
     return;
     

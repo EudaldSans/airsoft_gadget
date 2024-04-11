@@ -351,12 +351,14 @@ void Image::draw(bool force) {
     if (this->is_visible && !force) {return;}
     log_i("Drawing Image");
 
-    tft.drawXBitmap(this->x, this->y, this->image, this->width, this->height, this->color);
+    tft.drawXBitmap(this->x - this->width/2, this->y - this->height/2, this->image, this->width, this->height, this->color);
+    this->is_visible = true;
 }
 
 void Image::clear() {
     if (!this->is_visible) {return;}
     log_i("Clearing Image");
 
-    tft.drawXBitmap(this->x, this->y, this->image, this->width, this->height, get_word_config(CFG_COLOR_BG));
+    tft.drawXBitmap(this->x - this->width/2, this->y - this->height/2, this->image, this->width, this->height, get_word_config(CFG_COLOR_BG));
+    this->is_visible = false;
 }
