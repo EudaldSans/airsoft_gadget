@@ -312,15 +312,21 @@ void Meter::clear() {
 }
 
 void Meter::setLevel(uint8_t new_level) {
+    log_i("Setting meter level to: %d", new_level);
     if (!this->is_visible) {this->level = new_level; return;}
+    log_i("Meter is visible");
 
     uint8_t previous_bar_width = (this->width - 4) * this->level / 100;
-    uint8_t new_bar_width = (this->width - 4) * this->level / 100;
+    uint8_t new_bar_width = (this->width - 4) * new_level / 100;
+
+    log_i("new_level: %d, previous_level: %d, width: %d, previous_width: %d, new_width: %d", new_level, this->level, this-> width, previous_bar_width, new_bar_width);
 
     if (previous_bar_width == new_bar_width) {return;}
     else if (previous_bar_width > new_bar_width) {
+        log_i("Decreasing Meter level, pbw - nbw: %d, x: %d", previous_bar_width - new_bar_width, this->x - this->width/2 + 2 + new_bar_width);
         tft.fillRect(this->x - this->width/2 + 2 + new_bar_width, this->y - this->height/2 + 2, previous_bar_width - new_bar_width, this->height - 4, get_word_config(CFG_COLOR_BG));
     } else {
+        log_i("Increasing meter level, nbw - pbw: %d, x: %d", new_bar_width - previous_bar_width, this->x - this->width/2 + 2 + previous_bar_width);
         tft.fillRect(this->x - this->width/2 + 2 + previous_bar_width, this->y - this->height/2 + 2, new_bar_width - previous_bar_width, this->height - 4, this->color);
     }
 
