@@ -31,6 +31,7 @@ typedef enum {
     CFG_COLOR_2_MSB,
     CFG_COLOR_BG,
     CFG_COLOR_BG_MSB,
+    CFG_UV_ENABLED,
 
     LEN_CONFIGS
 

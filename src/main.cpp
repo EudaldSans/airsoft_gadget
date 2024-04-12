@@ -27,11 +27,9 @@
 #include <HMC5883L.h>
 
 #include "menus.h"
-#include "screen.h"
-#include "BlackOpsOne28.h"
-#include "BlackOpsOne75.h"
-
 #include "EG_logo.h"
+
+#include "settings.h"
 
 #include "config.h"
 
@@ -53,10 +51,8 @@
 bool init_menu = true, inside_menu = false, go_to_sleep = false, cycle_uv = false;
 
 HMC5883L mag;
-TextBox *my_text_box;
-Button *my_button;
-Image *my_image;
-Meter *my_meter;
+BoolSetting *my_bool_setting;
+SliderSetting *my_slider_setting;
 
 // Menu* menus[NUMBER_OF_MENUS];
 // Menu* menu_to_clear = NULL;
@@ -97,10 +93,15 @@ void setup(void) {
     delay(25);
 
     screen_init();
-    my_text_box = new TextBox(SCREEN_CENTER, SCREEN_CENTER, "test", get_word_config(CFG_COLOR_0), BlackOpsOne28);
-    my_button = new Button(SCREEN_CENTER, SCREEN_CENTER, "test", get_word_config(CFG_COLOR_0), SCREEN_WIDTH - 10, 30);
-    my_image = new Image(SCREEN_CENTER, SCREEN_CENTER, RTX_LOGO_W, RTX_LOGO_H, get_word_config(CFG_COLOR_0), RTX_logo_bitmap);
-    my_meter = new Meter(SCREEN_CENTER, SCREEN_CENTER, SCREEN_WIDTH - 10, 20, get_word_config(CFG_COLOR_0), 50);
+    
+    my_bool_setting = new BoolSetting(CFG_UV_ENABLED, "Test bool");
+    my_slider_setting = new SliderSetting(CFG_AMMO_COUNT_SETTING, "Test slider", 50, 0);
+
+    settings_activate_setting(my_bool_setting);
+
+    register_up_cb(settings_pressed_up);
+    register_down_cb(settings_pressed_down);
+    
     return;
 
     
@@ -166,31 +167,17 @@ void setup(void) {
 void loop() {
     int16_t mx, my, mz;
     static unsigned long last_flash_update = 0;
+    static unsigned long last_screen_update = 0;
     
     unsigned long now = millis();
 
     check_buttons();
 
-    my_image->draw(false);
-    delay(1000);
-    my_image->clear();
-    delay(1000);
-    my_image->draw(false);
-    delay(1000);
-    my_image->setColor(get_word_config(CFG_COLOR_0));
-    delay(1000);
-    my_image->setColor(get_word_config(CFG_COLOR_1));
-    delay(1000);
-    my_image->setColor(get_word_config(CFG_COLOR_2));
-    delay(1000);
-    my_image->setPosition(SCREEN_CENTER / 2, SCREEN_CENTER);
-    delay(1000);
-    my_image->setPosition(SCREEN_CENTER + SCREEN_CENTER / 2, SCREEN_CENTER);
-    delay(1000);
-    my_image->setPosition(SCREEN_CENTER, SCREEN_CENTER);
-    delay(1000);
-    my_image->clear();
-    delay(1000);
+    if ((now - last_screen_update) >= 200) {
+        settings_update_active_setting(false);
+        last_screen_update = now;
+    }
+    
     return;
     
     // Read raw heading measurements from device

@@ -4,6 +4,14 @@
 #include "screen.h"
 #include "config.h"
 
+class Setting;
+
+void settings_activate_setting (Setting* new_active_setting);
+void settings_deactivate_setting ( void );
+void settings_pressed_up(unsigned long press_time_ms);
+void settings_pressed_down(unsigned long press_time_ms);
+void settings_update_active_setting(bool force);
+
 
 class Setting {
     public: 
@@ -46,7 +54,7 @@ class BoolSetting : public Setting {
 
 class SliderSetting : public Setting {
     public:
-        SliderSetting(config_t config_id, String title, uint16_t level, uint16_t max_level, uint16_t min_level);
+        SliderSetting(config_t config_id, String title, uint16_t max_level, uint16_t min_level);
 
         void update(bool force);
         void clear( void );
@@ -56,6 +64,7 @@ class SliderSetting : public Setting {
         void pressed_down(unsigned long time);
     private:
         Meter* setting_meter;
+        TextBox* setting_value;
         uint16_t currrent_level, max_level, min_level;
         bool meter_updated;
 };
