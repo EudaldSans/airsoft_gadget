@@ -53,10 +53,11 @@ bool init_menu = true, inside_menu = false, go_to_sleep = false, cycle_uv = fals
 HMC5883L mag;
 BoolSetting *my_bool_setting;
 SliderSetting *my_slider_setting;
+Setting* settings[2];
 
 // Menu* menus[NUMBER_OF_MENUS];
 // Menu* menu_to_clear = NULL;
-uint8_t current_menu;
+uint8_t current_menu, current_setting = 0;
 
 
 void ir_sensr_0_ISR(void);
@@ -65,6 +66,15 @@ void ir_sensr_1_ISR(void);
 void test_cb(unsigned long time) {
     Serial.print("Test cb with time: ");
     Serial.println(time);
+}
+
+void swap_setting(unsigned long time) {
+    log_i("called swap setting %llu", time);
+    if (time > 0) {return;}
+
+    settings_deactivate_setting();
+    current_setting = (current_setting + 1) % 2;
+    settings_activate_setting(settings[current_setting]);
 }
 
 /** 
@@ -78,7 +88,6 @@ void setup(void) {
     Image logo = Image(SCREEN_CENTER - RTX_LOGO_W/2, SCREEN_CENTER - RTX_LOGO_H/2, RTX_LOGO_W, RTX_LOGO_H, splash_screen_color, RTX_logo_bitmap);
 
     init_buttons();
-    register_enter_cb(test_cb);
 
     init_config();
 
@@ -94,13 +103,15 @@ void setup(void) {
 
     screen_init();
     
-    my_bool_setting = new BoolSetting(CFG_UV_ENABLED, "Test bool");
-    my_slider_setting = new SliderSetting(CFG_AMMO_COUNT_SETTING, "Test slider", 50, 0);
+    settings[0] = new BoolSetting(CFG_UV_ENABLED, "Test bool");
+    settings[1] = new SliderSetting(CFG_AMMO_COUNT_SETTING, "Test slider", 50, 0);
+    settings_activate_setting(settings[current_setting]);
 
-    settings_activate_setting(my_bool_setting);
+    // settings_activate_setting(my_bool_setting);
 
     register_up_cb(settings_pressed_up);
     register_down_cb(settings_pressed_down);
+    register_enter_cb(swap_setting);
     
     return;
 

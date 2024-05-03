@@ -6,6 +6,7 @@
 #include "BlackOpsOne28.h"
 
 Setting* active_setting = NULL; 
+Setting* setting_to_deactivate = NULL;
 
 void settings_activate_setting (Setting* new_active_setting) {
     if (active_setting != NULL) {active_setting->deactivate();}
@@ -15,6 +16,7 @@ void settings_activate_setting (Setting* new_active_setting) {
 
 void settings_deactivate_setting () {
     if (active_setting != NULL) {active_setting->deactivate();}
+    if (setting_to_deactivate == NULL && active_setting != NULL) {setting_to_deactivate = active_setting;}
     active_setting = NULL;
 }
 
@@ -27,6 +29,11 @@ void settings_pressed_down(unsigned long press_time_ms) {
 }
 
 void settings_update_active_setting (bool force) {
+    if (setting_to_deactivate != NULL) {
+        setting_to_deactivate->clear(); 
+        setting_to_deactivate = NULL;
+    }
+
     if (active_setting != NULL) {active_setting->update(force);}
 }
 
@@ -158,6 +165,7 @@ void SliderSetting::clear( void ) {
     log_i("Clearing SliderSetting with id %d", this->config_id);
     this->title->clear();
     this->setting_meter->clear();
+    this->setting_value->clear();
 }
 
 void SliderSetting::pressed_up(unsigned long press_time_ms) {
@@ -179,4 +187,9 @@ void SliderSetting::pressed_center(unsigned long press_time_ms) {
     update_word_config(this->config_id, this->currrent_level);
     this->deactivate();
 }
+
+
+/***************************/
+/* MULTIPLE CHOICE SETTING */
+/***************************/
 
